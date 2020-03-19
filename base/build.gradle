@@ -32,6 +32,15 @@ dependencies {
     api "androidx.cardview:cardview:$rootProject.cardviewVersion"
     api "com.google.android.material:material:$rootProject.materialVersion"
     api "androidx.legacy:legacy-support-v4:$rootProject.supportV4Version"
+
+    api "androidx.navigation:navigation-fragment:$rootProject.navigationVersion"
+    api "androidx.navigation:navigation-ui:$rootProject.navigationVersion"
+
+    api "androidx.lifecycle:lifecycle-viewmodel:$rootProject.lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-livedata:$rootProject.lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-runtime:$rootProject.lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:$rootProject.lifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
     api "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
 
     testImplementation 'junit:junit:4.12'
