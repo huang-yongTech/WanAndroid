@@ -29,7 +29,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    api "androidx.cardview:cardview:$rootProject.cardviewVersion"
     api "com.google.android.material:material:$rootProject.materialVersion"
     api "androidx.legacy:legacy-support-v4:$rootProject.supportV4Version"
 

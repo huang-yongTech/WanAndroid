@@ -11,7 +11,6 @@ ext {
 
     //AndroidLibraries
     appcompatVersion = '1.1.0'
-    cardviewVersion = '1.0.0'
     materialVersion = '1.1.0'
     supportV4Version = '1.0.0'
     constraintLayoutVersion = '1.1.3'
