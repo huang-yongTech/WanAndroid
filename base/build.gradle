@@ -13,6 +13,7 @@ android {
         versionName globalConfiguration["androidVersionName"]
 
         testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        consumerProguardFiles 'consumer-rules.pro'
     }
 
     buildTypes {
@@ -26,6 +27,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    api "androidx.cardview:cardview:$rootProject.cardviewVersion"
+    api "com.google.android.material:material:$rootProject.materialVersion"
+    api "androidx.legacy:legacy-support-v4:$rootProject.supportV4Version"
+    api "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

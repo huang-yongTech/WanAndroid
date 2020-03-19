@@ -1,11 +1,70 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="MyTheme" parent="AppTheme" />
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:dropDownListViewStyle">@style/DropDownDivider</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
     </style>
 
+    <!--设置appBar的主题，黑底白字，主要是针对menu-->
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <!--设置弹出菜单的主题，白底黑字-->
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--APP启动欢迎界面-->
+    <style name="WelcomeStyle" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@mipmap/splash_welcome</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <!--DropDown下拉菜单样式-->
+    <style name="DropDownDivider" parent="android:Widget.ListView.DropDown">
+        <!-- 分隔线颜色 -->
+        <item name="android:divider">@color/grey</item>
+        <item name="android:dividerHeight">1dp</item>
+        <!--点击动画，优先级最低，会被xml中的覆盖，xml中会被Java代码中的覆盖-->
+        <item name="android:listSelector">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <!--溢出菜单样式设置-->
+    <style name="OverflowMenuStyle" parent="@style/Widget.AppCompat.Light.PopupMenu.Overflow">
+        <!--设置溢出菜单的背景，但没有悬浮阴影效果-->
+        <!--<item name="android:popupBackground">@color/blue</item>-->
+        <!--溢出菜单样式，设置为false则不会挡住标题栏 -->
+        <item name="overlapAnchor">false</item>
+        <item name="android:actionMenuTextColor">@color/colorPrimary</item>
+    </style>
+
+    <!--设置Menu初始显示的图片-->
+    <style name="OverflowButtonStyle" parent="@android:style/Widget.ActionButton.Overflow">
+        <item name="android:src">@mipmap/ic_launcher</item>
+    </style>
+
+    <style name="table_row_1_text_style" parent="@style/text_schedule_common_style">
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textColor">@color/grey_900</item>
+    </style>
+
+    <style name="table_row_2_text_style" parent="@style/text_schedule_common_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/grey_900</item>
+    </style>
+
+    <style name="text_schedule_common_style">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 </resources>
+
