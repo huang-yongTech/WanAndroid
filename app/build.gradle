@@ -32,8 +32,6 @@ dependencies {
 
     annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
 
-    annotationProcessor "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
     implementation "com.github.tbruyelle:rxpermissions:$rootProject.rxPermissionVersion"
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"

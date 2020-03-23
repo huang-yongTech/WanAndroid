@@ -17,9 +17,6 @@ ext {
     navigationVersion = '2.2.1'
     lifecycleVersion = '2.2.0'
 
-    //Libraries
-    butterKnifeVersion = '10.1.0'
-
     rxJavaVersion = '2.2.2'
     rxAndroidVersion = '2.1.0'
     retrofitVersion = '2.4.0'
