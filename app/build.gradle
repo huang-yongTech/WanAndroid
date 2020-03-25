@@ -21,6 +21,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    dataBinding {
+        enabled = true;
+    }
 }
 
 dependencies {
@@ -30,6 +34,9 @@ dependencies {
     implementation project(path: ':data')
     implementation project(path: ':library')
 
+    implementation "com.google.android:flexbox:$rootProject.flexBoxVersion"
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
 
     implementation "com.github.tbruyelle:rxpermissions:$rootProject.rxPermissionVersion"
@@ -40,6 +47,8 @@ dependencies {
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$rootProject.baseRecyclerViewAdapterHelperVersion"
     implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
     implementation "jp.wasabeef:glide-transformations:$rootProject.glideTransformationVersion"
+
+    implementation "com.youth.banner:banner:$rootProject.bannerVersion"
 
 //    implementation "org.webrtc:google-webrtc:$rootProject.webrtcVersion"
 //    implementation "io.socket:socket.io-client:$rootProject.socketIOversion"

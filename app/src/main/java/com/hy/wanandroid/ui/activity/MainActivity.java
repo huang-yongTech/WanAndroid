@@ -1,9 +1,11 @@
-package com.hy.wanandroid.ui;
+package com.hy.wanandroid.ui.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.hy.wanandroid.ui.R;
 
 public class MainActivity extends AppCompatActivity {
 

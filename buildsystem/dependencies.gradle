@@ -16,6 +16,7 @@ ext {
     constraintLayoutVersion = '1.1.3'
     navigationVersion = '2.2.1'
     lifecycleVersion = '2.2.0'
+    flexBoxVersion = '2.0.1'
 
     rxJavaVersion = '2.2.2'
     rxAndroidVersion = '2.1.0'
@@ -33,6 +34,8 @@ ext {
     glideTransformationVersion = '4.1.0'
     aRouterVersion = '1.4.1'
     aRouterCompilerVersion = '1.2.2'
+
+    bannerVersion = '2.0.0-alpha03'
 
     webrtcVersion = '1.0.28513'
     socketIOversion = '1.0.0'
