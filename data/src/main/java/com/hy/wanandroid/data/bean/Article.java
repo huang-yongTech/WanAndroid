@@ -11,7 +11,7 @@ import java.util.List;
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
-public class Datas {
+public class Article {
 
     private String apkLink;
     private int audit;

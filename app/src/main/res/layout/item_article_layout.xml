@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="article"
+            type="com.hy.wanandroid.data.bean.Article" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/item_article_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/item_article_date_tv"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/item_article_date_tv"
+            android:text="@{article.title}"
+            android:textColor="@color/black" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/item_article_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@{article.niceDate}" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/item_article_user_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_article_title_tv"
+            android:layout_alignBaseline="@id/item_article_favor_iv"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="4dp"
+            android:text="@{article.shareUser}" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/item_article_favor_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_article_date_tv"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="4dp" />
+    </RelativeLayout>
+</layout>
