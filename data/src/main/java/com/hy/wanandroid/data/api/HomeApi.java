@@ -14,6 +14,6 @@ public interface HomeApi {
      * 查询首页文章列表
      * @return 结果集
      */
-    @GET("/article/list/{page}/json")
+    @GET("article/list/{page}/json")
     LiveData<JsonRootBean<PageData<Article>>> queryHomeArticleList(@Path("page") int page);
 }

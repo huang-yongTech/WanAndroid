@@ -1,5 +1,7 @@
 package com.hy.wanandroid.ui.viewmodel;
 
+import android.view.View;
+
 import androidx.lifecycle.ViewModel;
 
 /**
@@ -8,5 +10,9 @@ import androidx.lifecycle.ViewModel;
  * description :
  */
 public class SearchViewModel extends ViewModel {
-    
+
+
+    public void clickEvent(View view) {
+
+    }
 }

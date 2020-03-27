@@ -15,6 +15,8 @@ import com.hy.wanandroid.ui.databinding.ItemArticleLayoutBinding;
  * description :
  */
 public class HomeArticleAdapter extends BaseQuickAdapter<Article, BaseViewHolder> {
+    private static final String TAG = "HomeArticleAdapter";
+
     public HomeArticleAdapter() {
         super(R.layout.item_article_layout);
     }

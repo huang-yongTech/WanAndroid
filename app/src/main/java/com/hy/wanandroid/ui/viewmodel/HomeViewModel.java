@@ -15,6 +15,8 @@ import com.hy.wanandroid.data.bean.JsonRootBean;
  * description :
  */
 public class HomeViewModel extends ViewModel {
+    private static final String TAG = "HomeViewModel";
+
     public LiveData<JsonRootBean<PageData<Article>>> queryHomeArticleList(int page) {
         return RetrofitUtils.getInstance()
                 .getApiService(HomeApi.class)

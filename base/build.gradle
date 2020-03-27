@@ -22,7 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -39,7 +38,7 @@ dependencies {
     api "androidx.lifecycle:lifecycle-livedata:$rootProject.lifecycleVersion"
     api "androidx.lifecycle:lifecycle-runtime:$rootProject.lifecycleVersion"
     api "androidx.lifecycle:lifecycle-viewmodel-savedstate:$rootProject.lifecycleVersion"
-    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
+    api "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
     api "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
 
     testImplementation 'junit:junit:4.12'

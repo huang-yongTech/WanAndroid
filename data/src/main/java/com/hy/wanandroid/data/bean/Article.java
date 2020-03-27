@@ -293,4 +293,14 @@ public class Article {
         return zan;
     }
 
+    @Override
+    public String toString() {
+        return "Article{" +
+                "apkLink='" + apkLink + '\'' +
+                ", audit=" + audit +
+                ", author='" + author + '\'' +
+                ", canEdit=" + canEdit +
+                ", chapterId=" + chapterId +
+                '}';
+    }
 }

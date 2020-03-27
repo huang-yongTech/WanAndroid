@@ -1,5 +1,7 @@
 package com.hy.wanandroid.data.api;
 
+import com.hy.wanandroid.data.utils.LiveDataCallAdapterFactory;
+
 import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +27,7 @@ public class RetrofitUtils {
         return Holder.RETROFIT_UTILS;
     }
 
-    private static final String baseUrl = "https://www.wanandroid.com";
+    private static final String baseUrl = "https://www.wanandroid.com/";
 
     /**
      * 常规网络请求
@@ -45,6 +47,7 @@ public class RetrofitUtils {
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();

@@ -7,10 +7,6 @@
     <data>
 
         <variable
-            name="clickListener"
-            type="com.hy.wanandroid.ui.listener.ClickListener" />
-
-        <variable
             name="view"
             type="android.view.View" />
 
@@ -64,9 +60,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:button="null"
+                android:button="@null"
                 android:drawableEnd="@drawable/ic_delete"
-                android:onClick="@{()->clickListener.onClickListener(view)}"
+                android:onClick="@{()->vm.clickEvent(view)}"
                 android:padding="8dp" />
         </RelativeLayout>
 
@@ -74,7 +70,9 @@
             android:id="@+id/search_history_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:padding="8dp"
+            app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
             tools:listitem="@layout/item_word_layout" />
 
         <View
@@ -93,7 +91,9 @@
             android:id="@+id/search_hot_word_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:padding="8dp"
+            app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
             tools:listitem="@layout/item_word_layout" />
     </LinearLayout>
 
