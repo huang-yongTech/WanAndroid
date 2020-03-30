@@ -14,14 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.hy.wanandroid.data.bean.Article;
 import com.hy.wanandroid.data.bean.JsonRootBean;
 import com.hy.wanandroid.data.bean.PageData;
+import com.hy.wanandroid.library.widget.LinearItemDecoration;
 import com.hy.wanandroid.ui.R;
 import com.hy.wanandroid.ui.adapter.HomeArticleAdapter;
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding;
 import com.hy.wanandroid.ui.viewmodel.HomeViewModel;
+
+import java.util.Objects;
 
 import io.reactivex.functions.Consumer;
 
@@ -82,7 +87,14 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mAdapter = new HomeArticleAdapter();
+        mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
         mBinding.homeRecyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+
+            }
+        });
 
         mHomeViewModel.queryHomeArticleList(0).observe(getViewLifecycleOwner(), new Observer<JsonRootBean<PageData<Article>>>() {
             @Override
