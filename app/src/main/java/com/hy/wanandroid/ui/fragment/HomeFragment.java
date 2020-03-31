@@ -4,11 +4,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +15,22 @@ import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.chad.library.adapter.base.module.LoadMoreModule;
+import com.hy.wanandroid.library.base.BaseFragment;
 import com.hy.wanandroid.data.bean.Article;
 import com.hy.wanandroid.data.bean.JsonRootBean;
 import com.hy.wanandroid.data.bean.PageData;
 import com.hy.wanandroid.library.widget.LinearItemDecoration;
 import com.hy.wanandroid.ui.R;
-import com.hy.wanandroid.ui.adapter.HomeArticleAdapter;
+import com.hy.wanandroid.ui.adapter.ArticleListAdapter;
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding;
 import com.hy.wanandroid.ui.viewmodel.HomeViewModel;
 
 import java.util.Objects;
 
-import io.reactivex.functions.Consumer;
-
 /**
  * 首页fragment
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends BaseFragment {
     private static final String TAG = "HomeFragment";
 
     private static final String ARG_PARAM1 = "param1";
@@ -44,7 +41,7 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel mHomeViewModel;
     private FragmentHomeBinding mBinding;
-    private HomeArticleAdapter mAdapter;
+    private ArticleListAdapter mAdapter;
 
     public HomeFragment() {
     }
@@ -77,7 +74,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mBinding = FragmentHomeBinding.bind(view);
-        mBinding.homeInclude.setClickProxy(new ClickProxy());
+        mBinding.setClickProxy(new ClickProxy());
         mBinding.setVm(mHomeViewModel);
         return view;
     }
@@ -86,7 +83,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new HomeArticleAdapter();
+        mAdapter = new ArticleListAdapter();
         mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
         mBinding.homeRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -113,7 +110,7 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(view.getContext(), "菜单点击事件", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.public_search_btn:
-                    Toast.makeText(view.getContext(), "查找点击事件", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(view).navigate(R.id.action_home_fragment_to_search_fragment);
                     break;
             }
         }

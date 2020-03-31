@@ -7,26 +7,87 @@
     <data>
 
         <variable
+            name="clickProxy"
+            type="com.hy.wanandroid.ui.fragment.HomeFragment.ClickProxy" />
+
+        <variable
+            name="view"
+            type="android.view.View" />
+
+        <variable
             name="vm"
             type="com.hy.wanandroid.ui.viewmodel.HomeViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:fitsSystemWindows="true">
 
-        <include
-            android:id="@+id/home_include"
-            layout="@layout/public_toolbar" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/home_recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_article_layout" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/AppBarOverlay">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/public_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?android:attr/actionBarSize"
+                    app:contentInsetEnd="2dp"
+                    app:contentInsetStart="2dp"
+                    app:popupTheme="@style/PopupOverlay">
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/public_menu_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:button="@null"
+                        android:drawableStart="@drawable/selector_menu"
+                        android:onClick="@{(view)->clickProxy.clickEvent(view)}"
+                        android:padding="8dp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="WanAndroid"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/public_search_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:button="@null"
+                        android:drawableEnd="@drawable/selector_search"
+                        android:onClick="@{(view)->clickProxy.clickEvent(view)}"
+                        android:padding="8dp" />
+                </androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/home_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_article_layout" />
+        </LinearLayout>
+
+        <com.google.android.material.internal.ScrimInsetsFrameLayout
+            android:id="@+id/home_left_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

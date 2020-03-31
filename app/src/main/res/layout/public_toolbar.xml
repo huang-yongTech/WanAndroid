@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <variable
             name="clickProxy"
-            type="com.hy.wanandroid.ui.fragment.HomeFragment.ClickProxy" />
+            type="com.hy.wanandroid.ui.click.PublicClickProxy" />
 
         <variable
             name="view"
@@ -24,37 +23,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
-            app:contentInsetEnd="2dp"
-            app:contentInsetStart="2dp"
-            app:popupTheme="@style/PopupOverlay">
+            app:contentInsetStart="4dp"
+            app:titleTextColor="@color/white">
 
             <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/public_menu_btn"
+                android:id="@+id/public_back_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
                 android:button="@null"
-                android:drawableStart="@drawable/selector_menu"
-                android:onClick="@{(view)->clickProxy.clickEvent(view)}"
-                android:padding="8dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                tools:text="首页标题" />
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/public_search_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:button="@null"
-                android:drawableEnd="@drawable/selector_search"
+                android:drawableStart="@drawable/ic_arrow_back_black_24dp"
                 android:onClick="@{(view)->clickProxy.clickEvent(view)}"
                 android:padding="8dp" />
         </androidx.appcompat.widget.Toolbar>
+
     </com.google.android.material.appbar.AppBarLayout>
 </layout>

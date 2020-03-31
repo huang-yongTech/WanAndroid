@@ -14,10 +14,10 @@ import com.hy.wanandroid.ui.databinding.ItemArticleLayoutBinding;
  * email：756655135@qq.com
  * description :
  */
-public class HomeArticleAdapter extends BaseQuickAdapter<Article, BaseViewHolder> {
+public class ArticleListAdapter extends BaseQuickAdapter<Article, BaseViewHolder> {
     private static final String TAG = "HomeArticleAdapter";
 
-    public HomeArticleAdapter() {
+    public ArticleListAdapter() {
         super(R.layout.item_article_layout);
     }
 

@@ -9,16 +9,35 @@
     <fragment
         android:id="@+id/nav_fragment_home"
         android:name="com.hy.wanandroid.ui.fragment.HomeFragment"
-        android:label="fragment_ home"
+        android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_home_fragment_to_search_fragment"
-            app:destination="@id/nav_fragment_search" />
+            app:destination="@id/nav_fragment_search"
+            app:enterAnim="@anim/h_fragment_enter"
+            app:exitAnim="@anim/h_fragment_exit"
+            app:popEnterAnim="@anim/h_fragment_pop_enter"
+            app:popExitAnim="@anim/h_fragment_pop_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_fragment_search"
         android:name="com.hy.wanandroid.ui.fragment.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+
+        <action
+            android:id="@+id/action_search_fragment_to_search_result_fragment"
+            app:destination="@id/nav_fragment_search_result"
+            app:enterAnim="@anim/h_fragment_enter"
+            app:exitAnim="@anim/h_fragment_exit"
+            app:popEnterAnim="@anim/h_fragment_pop_enter"
+            app:popExitAnim="@anim/h_fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_fragment_search_result"
+        android:name="com.hy.wanandroid.ui.fragment.SearchResultFragment"
+        android:label="fragment_search_result"
+        tools:layout="@layout/fragment_search_result" />
 </navigation>

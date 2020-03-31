@@ -1,7 +1,6 @@
 package com.hy.wanandroid.data.api;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.hy.wanandroid.data.bean.HotWord;
 import com.hy.wanandroid.data.bean.JsonListRootBean;
@@ -20,5 +19,5 @@ public interface SearchApi {
      * @return 结果集
      */
     @GET("/hotkey/json")
-    MutableLiveData<JsonListRootBean<HotWord>> queryHotWords();
+    LiveData<JsonListRootBean<HotWord>> getHotWords();
 }

@@ -27,8 +27,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.google.android.material:material:$rootProject.materialVersion"
-    implementation "androidx.collection:collection:$rootProject.collectionVersion"
+    implementation project(path: ':base')
 
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"

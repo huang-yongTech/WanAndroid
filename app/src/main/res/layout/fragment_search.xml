@@ -30,16 +30,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?android:attr/actionBarSize"
-                app:contentInsetEnd="24dp"
-                app:contentInsetStart="0dp"
-                app:navigationIcon="@drawable/ic_arrow_back_black_24dp">
+                app:contentInsetEnd="4dp"
+                app:contentInsetStart="4dp">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/search_key_word_et"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="请输入关键词"
-                    android:textColor="@color/white" />
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/search_back_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:button="@null"
+                        android:drawableStart="@drawable/ic_arrow_back_black_24dp"
+                        android:onClick="@{(view)->vm.clickEvent(view)}"
+                        android:padding="8dp" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/search_key_word_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@id/search_btn"
+                        android:layout_toEndOf="@id/search_back_btn"
+                        android:background="@drawable/round_conner_transparent_bg"
+                        android:drawableEnd="@drawable/selector_search_et_drawable"
+                        android:hint="请输入关键词"
+                        android:padding="4dp"
+                        android:text="@={vm.mSearchKey}"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/search_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:button="@null"
+                        android:drawableEnd="@drawable/ic_search_normal"
+                        android:onClick="@{(view)->vm.clickEvent(view)}"
+                        android:padding="8dp" />
+                </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -62,7 +95,7 @@
                 android:layout_alignParentEnd="true"
                 android:button="@null"
                 android:drawableEnd="@drawable/ic_delete"
-                android:onClick="@{()->vm.clickEvent(view)}"
+                android:onClick="@{(view)->vm.clickEvent(view)}"
                 android:padding="8dp" />
         </RelativeLayout>
 
