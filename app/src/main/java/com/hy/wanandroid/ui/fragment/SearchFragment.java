@@ -18,6 +18,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.hy.wanandroid.data.bean.HotWord;
 import com.hy.wanandroid.data.bean.JsonListRootBean;
+import com.hy.wanandroid.data.dao.AppDatabase;
 import com.hy.wanandroid.library.base.BaseFragment;
 import com.hy.wanandroid.library.util.BarUtils;
 import com.hy.wanandroid.ui.R;
@@ -87,6 +88,7 @@ public class SearchFragment extends BaseFragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mBinding.searchKeyWordEt.setSelected(!TextUtils.isEmpty(s));
+                mSearchViewModel.mSearchEnabled.set(!TextUtils.isEmpty(s));
             }
 
             @Override
@@ -98,6 +100,8 @@ public class SearchFragment extends BaseFragment {
 
         SearchKeyAdapter historyAdapter = new SearchKeyAdapter();
         mBinding.searchHistoryRecyclerView.setAdapter(historyAdapter);
+        historyAdapter.setNewData(mSearchViewModel.mHistoryKeyList.get());
+
         SearchKeyAdapter hotKeyAdapter = new SearchKeyAdapter();
         mBinding.searchHotWordRecyclerView.setAdapter(hotKeyAdapter);
 
@@ -110,7 +114,9 @@ public class SearchFragment extends BaseFragment {
         hotKeyAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-
+                String name = hotKeyAdapter.getData().get(position).getName();
+                mSearchViewModel.mSearchKey.set(name);
+                mSearchViewModel.mHistoryKeyList.get().add(new HotWord(name));
             }
         });
 

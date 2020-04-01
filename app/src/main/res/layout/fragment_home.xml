@@ -7,14 +7,6 @@
     <data>
 
         <variable
-            name="clickProxy"
-            type="com.hy.wanandroid.ui.fragment.HomeFragment.ClickProxy" />
-
-        <variable
-            name="view"
-            type="android.view.View" />
-
-        <variable
             name="vm"
             type="com.hy.wanandroid.ui.viewmodel.HomeViewModel" />
     </data>
@@ -50,7 +42,7 @@
                         android:layout_gravity="start"
                         android:button="@null"
                         android:drawableStart="@drawable/selector_menu"
-                        android:onClick="@{(view)->clickProxy.clickEvent(view)}"
+                        android:onClick="@{(view)->vm.clickEvent(view)}"
                         android:padding="8dp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -68,7 +60,7 @@
                         android:layout_gravity="end"
                         android:button="@null"
                         android:drawableEnd="@drawable/selector_search"
-                        android:onClick="@{(view)->clickProxy.clickEvent(view)}"
+                        android:onClick="@{(view)->vm.clickEvent(view)}"
                         android:padding="8dp" />
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.AppBarLayout>

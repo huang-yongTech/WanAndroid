@@ -17,7 +17,7 @@ public final class Constant {
     /**
      * 界面跳转传值类型
      */
-    public static final String TYPE_SEARCH = "type_search";
+    public static final String TYPE_SEARCH_KEY = "type_search_key";
 
     /**
      * 附件id和附件名标识

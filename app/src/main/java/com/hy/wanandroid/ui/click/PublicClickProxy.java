@@ -13,9 +13,9 @@ public class PublicClickProxy {
     /**
      * 公共toolbar点击事件
      *
-     * @param view view
+     * @param v v
      */
-    public void clickEvent(View view) {
-        Navigation.findNavController(view).navigateUp();
+    public void clickEvent(View v) {
+        Navigation.findNavController(v).navigateUp();
     }
 }

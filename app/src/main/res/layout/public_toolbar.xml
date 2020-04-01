@@ -5,12 +5,12 @@
     <data>
 
         <variable
-            name="clickProxy"
-            type="com.hy.wanandroid.ui.click.PublicClickProxy" />
+            name="title"
+            type="String" />
 
         <variable
-            name="view"
-            type="android.view.View" />
+            name="clickProxy"
+            type="com.hy.wanandroid.ui.click.PublicClickProxy" />
     </data>
 
     <com.google.android.material.appbar.AppBarLayout
@@ -34,6 +34,18 @@
                 android:drawableStart="@drawable/ic_arrow_back_black_24dp"
                 android:onClick="@{(view)->clickProxy.clickEvent(view)}"
                 android:padding="8dp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/public_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="end"
+                android:maxLength="8"
+                android:singleLine="true"
+                android:text="@{title}"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -7,10 +7,6 @@
     <data>
 
         <variable
-            name="view"
-            type="android.view.View" />
-
-        <variable
             name="vm"
             type="com.hy.wanandroid.ui.viewmodel.SearchViewModel" />
     </data>
@@ -70,6 +66,7 @@
                         android:layout_alignParentEnd="true"
                         android:button="@null"
                         android:drawableEnd="@drawable/ic_search_normal"
+                        android:enabled="@{vm.mSearchEnabled}"
                         android:onClick="@{(view)->vm.clickEvent(view)}"
                         android:padding="8dp" />
                 </RelativeLayout>

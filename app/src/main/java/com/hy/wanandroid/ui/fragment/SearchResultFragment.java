@@ -2,6 +2,7 @@ package com.hy.wanandroid.ui.fragment;
 
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.hy.wanandroid.library.base.BaseFragment;
 import com.hy.wanandroid.library.util.BarUtils;
+import com.hy.wanandroid.library.util.Constant;
 import com.hy.wanandroid.ui.R;
 import com.hy.wanandroid.ui.adapter.ArticleListAdapter;
 import com.hy.wanandroid.ui.click.PublicClickProxy;
@@ -25,11 +27,9 @@ import com.hy.wanandroid.ui.viewmodel.SearchResultViewModel;
  * 搜索结果界面
  */
 public class SearchResultFragment extends BaseFragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "SearchResultFragment";
 
-    private String mParam1;
-    private String mParam2;
+    private String mSearchKey;
 
     private SearchResultViewModel mViewModel;
     private FragmentSearchResultBinding mBinding;
@@ -41,11 +41,10 @@ public class SearchResultFragment extends BaseFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static SearchResultFragment newInstance(String param1, String param2) {
+    public static SearchResultFragment newInstance(String searchKey) {
         SearchResultFragment fragment = new SearchResultFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(Constant.TYPE_SEARCH_KEY, searchKey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,8 +53,7 @@ public class SearchResultFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mSearchKey = getArguments().getString(Constant.TYPE_SEARCH_KEY);
         }
         mViewModel = new ViewModelProvider(this, getDefaultViewModelProviderFactory()).get(SearchResultViewModel.class);
     }
@@ -66,7 +64,7 @@ public class SearchResultFragment extends BaseFragment {
         mBinding = FragmentSearchResultBinding.bind(view);
         mBinding.setVm(mViewModel);
         mBinding.searchResultInclude.setClickProxy(new PublicClickProxy());
-
+        mBinding.searchResultInclude.setTitle(mSearchKey);
         BarUtils.setAppToolBarMarginTop(getContext(), mBinding.searchResultInclude.publicToolbar);
         return view;
     }
@@ -83,5 +81,7 @@ public class SearchResultFragment extends BaseFragment {
 
             }
         });
+
+
     }
 }

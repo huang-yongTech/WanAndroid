@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import io.reactivex.annotations.NonNull;
+
 /**
  * Created by huangyong on 2018/3/12.
  * 软键盘相关工具类
@@ -30,6 +32,18 @@ public final class KeyboardUtils {
                 imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         }
+    }
+
+    /**
+     * Hide the soft input.
+     *
+     * @param view The view.
+     */
+    public static void hideSoftInput(@NonNull final View view) {
+        InputMethodManager imm =
+                (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     /**

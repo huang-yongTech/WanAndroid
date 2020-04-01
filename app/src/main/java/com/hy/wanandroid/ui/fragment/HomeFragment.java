@@ -6,12 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
@@ -74,7 +72,6 @@ public class HomeFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mBinding = FragmentHomeBinding.bind(view);
-        mBinding.setClickProxy(new ClickProxy());
         mBinding.setVm(mHomeViewModel);
         return view;
     }
@@ -101,18 +98,5 @@ public class HomeFragment extends BaseFragment {
                 }
             }
         });
-    }
-
-    public static class ClickProxy {
-        public void clickEvent(View view) {
-            switch (view.getId()) {
-                case R.id.public_menu_btn:
-                    Toast.makeText(view.getContext(), "菜单点击事件", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.public_search_btn:
-                    Navigation.findNavController(view).navigate(R.id.action_home_fragment_to_search_fragment);
-                    break;
-            }
-        }
     }
 }
