@@ -15,7 +15,6 @@ import com.hy.wanandroid.data.api.RetrofitUtils;
 import com.hy.wanandroid.data.api.SearchApi;
 import com.hy.wanandroid.data.bean.HotWord;
 import com.hy.wanandroid.data.bean.JsonListRootBean;
-import com.hy.wanandroid.data.dao.AppDatabase;
 import com.hy.wanandroid.data.dao.SearchHistoryDataSource;
 import com.hy.wanandroid.library.util.Constant;
 import com.hy.wanandroid.library.util.KeyboardUtils;
@@ -45,11 +44,10 @@ public class SearchViewModel extends AndroidViewModel {
 
     public SearchViewModel(@NonNull Application application) {
         super(application);
-        AppDatabase database = AppDatabase.getInstance(application.getBaseContext());
-        mHistoryDataSource = new SearchHistoryDataSource(database.historyDao());
+        mHistoryDataSource = new SearchHistoryDataSource(application);
     }
 
-    public void insertSearchKey(HotWord hotWord) {
+    private void insertSearchKey(HotWord hotWord) {
         mHistoryDataSource.insertSearchKey(hotWord);
     }
 
@@ -80,7 +78,7 @@ public class SearchViewModel extends AndroidViewModel {
                 Navigation.findNavController(view).navigateUp();
                 break;
             case R.id.search_delete_history_btn:
-                mHistoryKeyList.get().clear();
+                mHistoryDataSource.deleteKeys();
                 break;
             case R.id.search_btn:
                 Bundle bundle = new Bundle();
@@ -88,7 +86,6 @@ public class SearchViewModel extends AndroidViewModel {
                 KeyboardUtils.hideSoftInput(view);
                 HotWord hotWord = new HotWord(mSearchKey.get());
                 insertSearchKey(hotWord);
-                mHistoryKeyList.get().add(hotWord);
                 Navigation.findNavController(view).navigate(R.id.action_search_fragment_to_search_result_fragment, bundle);
                 break;
         }

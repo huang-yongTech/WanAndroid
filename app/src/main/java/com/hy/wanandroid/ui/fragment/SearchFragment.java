@@ -18,13 +18,14 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.hy.wanandroid.data.bean.HotWord;
 import com.hy.wanandroid.data.bean.JsonListRootBean;
-import com.hy.wanandroid.data.dao.AppDatabase;
 import com.hy.wanandroid.library.base.BaseFragment;
 import com.hy.wanandroid.library.util.BarUtils;
 import com.hy.wanandroid.ui.R;
 import com.hy.wanandroid.ui.adapter.SearchKeyAdapter;
 import com.hy.wanandroid.ui.databinding.FragmentSearchBinding;
 import com.hy.wanandroid.ui.viewmodel.SearchViewModel;
+
+import java.util.List;
 
 /**
  * 查找界面fragment
@@ -38,6 +39,9 @@ public class SearchFragment extends BaseFragment {
 
     private SearchViewModel mSearchViewModel;
     private FragmentSearchBinding mBinding;
+
+    private SearchKeyAdapter mHistoryAdapter;
+    private SearchKeyAdapter mHotKeyAdapter;
 
     public SearchFragment() {
     }
@@ -72,6 +76,9 @@ public class SearchFragment extends BaseFragment {
         mBinding = FragmentSearchBinding.bind(view);
         mBinding.setVm(mSearchViewModel);
         BarUtils.setAppToolBarMarginTop(getContext(), mBinding.searchToolbar);
+
+        initView();
+        initAdapter();
         return view;
     }
 
@@ -79,6 +86,10 @@ public class SearchFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getData();
+    }
+
+    private void initView() {
         mBinding.searchKeyWordEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -97,33 +108,45 @@ public class SearchFragment extends BaseFragment {
             }
         });
         clickRightClear(mBinding.searchKeyWordEt);
+    }
 
-        SearchKeyAdapter historyAdapter = new SearchKeyAdapter();
-        mBinding.searchHistoryRecyclerView.setAdapter(historyAdapter);
-        historyAdapter.setNewData(mSearchViewModel.mHistoryKeyList.get());
+    private void initAdapter() {
+        mHistoryAdapter = new SearchKeyAdapter();
+        mBinding.searchHistoryRecyclerView.setAdapter(mHistoryAdapter);
+        mHistoryAdapter.setNewData(mSearchViewModel.mHistoryKeyList.get());
 
-        SearchKeyAdapter hotKeyAdapter = new SearchKeyAdapter();
-        mBinding.searchHotWordRecyclerView.setAdapter(hotKeyAdapter);
+        mHotKeyAdapter = new SearchKeyAdapter();
+        mBinding.searchHotWordRecyclerView.setAdapter(mHotKeyAdapter);
 
-        historyAdapter.setOnItemClickListener(new OnItemClickListener() {
+        mHistoryAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-
+                String name = mHistoryAdapter.getData().get(position).getName();
+                mSearchViewModel.mSearchKey.set(name);
             }
         });
-        hotKeyAdapter.setOnItemClickListener(new OnItemClickListener() {
+        mHotKeyAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-                String name = hotKeyAdapter.getData().get(position).getName();
+                String name = mHotKeyAdapter.getData().get(position).getName();
                 mSearchViewModel.mSearchKey.set(name);
-                mSearchViewModel.mHistoryKeyList.get().add(new HotWord(name));
+            }
+        });
+    }
+
+    @Override
+    protected void getData() {
+        mSearchViewModel.getHistoryKey().observe(getViewLifecycleOwner(), new Observer<List<HotWord>>() {
+            @Override
+            public void onChanged(List<HotWord> hotWords) {
+                mHistoryAdapter.setNewData(hotWords);
             }
         });
 
         mSearchViewModel.getHotWords().observe(getViewLifecycleOwner(), new Observer<JsonListRootBean<HotWord>>() {
             @Override
             public void onChanged(JsonListRootBean<HotWord> hotWordJsonListRootBean) {
-                hotKeyAdapter.setNewData(hotWordJsonListRootBean.getData());
+                mHotKeyAdapter.setNewData(hotWordJsonListRootBean.getData());
             }
         });
     }

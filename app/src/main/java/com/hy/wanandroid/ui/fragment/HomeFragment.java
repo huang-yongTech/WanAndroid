@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.chad.library.adapter.base.listener.OnLoadMoreListener;
 import com.hy.wanandroid.library.base.BaseFragment;
 import com.hy.wanandroid.data.bean.Article;
 import com.hy.wanandroid.data.bean.JsonRootBean;
@@ -22,6 +23,9 @@ import com.hy.wanandroid.ui.R;
 import com.hy.wanandroid.ui.adapter.ArticleListAdapter;
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding;
 import com.hy.wanandroid.ui.viewmodel.HomeViewModel;
+import com.hy.wanandroid.library.widget.CustomLoadMoreView;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.Objects;
 
@@ -73,6 +77,10 @@ public class HomeFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mBinding = FragmentHomeBinding.bind(view);
         mBinding.setVm(mHomeViewModel);
+
+        initRefresh();
+        initAdapter();
+        initRecyclerView();
         return view;
     }
 
@@ -80,15 +88,57 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getData();
+    }
+
+    private void initAdapter() {
         mAdapter = new ArticleListAdapter();
-        mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
-        mBinding.homeRecyclerView.setAdapter(mAdapter);
+
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
 
             }
         });
+
+        Objects.requireNonNull(mAdapter.getLoadMoreModule()).setLoadMoreView(new CustomLoadMoreView());
+        mAdapter.getLoadMoreModule().setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                loadMore();
+            }
+        });
+        mAdapter.getLoadMoreModule().setAutoLoadMore(true);
+        //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
+        mAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
+    }
+
+    private void initRecyclerView() {
+        mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
+        mBinding.homeRecyclerView.setAdapter(mAdapter);
+    }
+
+    private void initRefresh() {
+        mBinding.homeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                mBinding.homeRefreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getData();
+                    }
+                }, 1200);
+                mBinding.homeRefreshLayout.finishRefresh(1500);
+            }
+        });
+    }
+
+    /**
+     * 下拉刷新数据
+     */
+    @Override
+    protected void getData() {
+        mAdapter.setEmptyView(getLoadingView(mBinding.homeRecyclerView));
 
         mHomeViewModel.queryHomeArticleList(0).observe(getViewLifecycleOwner(), new Observer<JsonRootBean<PageData<Article>>>() {
             @Override
@@ -98,5 +148,12 @@ public class HomeFragment extends BaseFragment {
                 }
             }
         });
+    }
+
+    /**
+     * 上拉加载数据
+     */
+    private void loadMore() {
+
     }
 }

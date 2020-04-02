@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.hy.wanandroid.data.bean.Article;
 import com.hy.wanandroid.ui.R;
@@ -14,7 +15,7 @@ import com.hy.wanandroid.ui.databinding.ItemArticleLayoutBinding;
  * email：756655135@qq.com
  * description :
  */
-public class ArticleListAdapter extends BaseQuickAdapter<Article, BaseViewHolder> {
+public class ArticleListAdapter extends BaseQuickAdapter<Article, BaseViewHolder> implements LoadMoreModule {
     private static final String TAG = "HomeArticleAdapter";
 
     public ArticleListAdapter() {

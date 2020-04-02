@@ -1,5 +1,7 @@
 package com.hy.wanandroid.library.util;
 
+import java.util.Random;
+
 /**
  * Created by huangyong on 2017/11/28.
  * 常量提供工具类
@@ -9,6 +11,12 @@ public final class Constant {
 
     private Constant() {
     }
+
+    /**
+     * 颜色范围
+     */
+    public static final int COLOR_RGB_MIN = 20;
+    public static final int COLOR_RGB_MAX = 230;
 
     /**
      * 界面跳转传值标识

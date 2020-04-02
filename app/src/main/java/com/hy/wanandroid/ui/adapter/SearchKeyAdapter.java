@@ -6,6 +6,8 @@ import androidx.databinding.DataBindingUtil;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.hy.wanandroid.data.bean.HotWord;
+import com.hy.wanandroid.library.util.Constant;
+import com.hy.wanandroid.library.util.RandomUtils;
 import com.hy.wanandroid.ui.R;
 import com.hy.wanandroid.ui.databinding.ItemWordLayoutBinding;
 
@@ -31,6 +33,8 @@ public class SearchKeyAdapter extends BaseQuickAdapter<HotWord, BaseViewHolder> 
         ItemWordLayoutBinding binding = baseViewHolder.getBinding();
         if (binding != null) {
             binding.setWord(hotWord);
+            binding.itemWordTv.setTextColor(RandomUtils.INSTANCE.randomColor(Constant.COLOR_RGB_MIN,
+                    Constant.COLOR_RGB_MAX));
             binding.executePendingBindings();
         }
     }

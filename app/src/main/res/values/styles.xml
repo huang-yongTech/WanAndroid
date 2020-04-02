@@ -44,27 +44,5 @@
     <style name="OverflowButtonStyle" parent="@android:style/Widget.ActionButton.Overflow">
         <item name="android:src">@mipmap/ic_launcher</item>
     </style>
-
-    <style name="table_row_1_text_style" parent="@style/text_schedule_common_style">
-        <item name="android:layout_width">110dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:textColor">@color/grey_900</item>
-    </style>
-
-    <style name="table_row_2_text_style" parent="@style/text_schedule_common_style">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:textColor">@color/grey_900</item>
-    </style>
-
-    <style name="text_schedule_common_style">
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
-        <item name="android:paddingStart">10dp</item>
-        <item name="android:paddingEnd">10dp</item>
-        <item name="android:textSize">14sp</item>
-    </style>
 </resources>
 

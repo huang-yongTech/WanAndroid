@@ -55,6 +55,7 @@
                         android:drawableEnd="@drawable/selector_search_et_drawable"
                         android:hint="请输入关键词"
                         android:padding="4dp"
+                        android:singleLine="true"
                         android:text="@={vm.mSearchKey}"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
@@ -96,13 +97,14 @@
                 android:padding="8dp" />
         </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.hy.wanandroid.library.widget.MaxHeightRecyclerView
             android:id="@+id/search_history_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="8dp"
             app:layoutManager="com.google.android.flexbox.FlexboxLayoutManager"
+            app:maxHeight="200dp"
             tools:listitem="@layout/item_word_layout" />
 
         <View

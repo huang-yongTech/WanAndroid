@@ -1,5 +1,6 @@
 package com.hy.wanandroid.data.bean;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -12,11 +13,12 @@ import androidx.room.PrimaryKey;
  */
 @Entity(tableName = "hot_word")
 public class HotWord {
-    @PrimaryKey
     private int id;
     private String link;
+    @PrimaryKey
+    @NonNull
     @ColumnInfo
-    private String name;
+    private String name = "";
     private int order;
     private int visible;
 
@@ -24,7 +26,7 @@ public class HotWord {
     }
 
     @Ignore
-    public HotWord(String name) {
+    public HotWord(@NonNull String name) {
         this.name = name;
     }
 
@@ -44,10 +46,11 @@ public class HotWord {
         return link;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }

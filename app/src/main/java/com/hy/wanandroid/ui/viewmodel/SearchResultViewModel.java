@@ -1,18 +1,27 @@
 package com.hy.wanandroid.ui.viewmodel;
 
-import android.app.Application;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
+import com.hy.wanandroid.data.api.RetrofitUtils;
+import com.hy.wanandroid.data.api.SearchApi;
+import com.hy.wanandroid.data.bean.Article;
+import com.hy.wanandroid.data.bean.JsonRootBean;
+import com.hy.wanandroid.data.bean.PageData;
 
 /**
  * author：created by huangyong on 2020/3/31 17:03
  * email：756655135@qq.com
  * description :
  */
-public class SearchResultViewModel extends AndroidViewModel {
-
-    public SearchResultViewModel(@NonNull Application application) {
-        super(application);
+public class SearchResultViewModel extends ViewModel {
+    /**
+     * 根据关键字搜索文章
+     */
+    public LiveData<JsonRootBean<PageData<Article>>> queryArticlesByKey(int page, String key) {
+        return RetrofitUtils.getInstance()
+                .getApiService(SearchApi.class)
+                .queryArticlesByKey(page, key)
+                ;
     }
 }

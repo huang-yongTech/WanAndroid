@@ -22,6 +22,7 @@ ext {
     lifecycleVersion = '2.2.0'
     flexBoxVersion = '2.0.1'
     roomVersion = '2.2.5'
+    pagingVersion = '2.1.2'
 
     rxJavaVersion = '2.2.2'
     rxAndroidVersion = '2.1.0'
