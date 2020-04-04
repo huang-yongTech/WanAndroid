@@ -145,6 +145,8 @@ public class HomeFragment extends BaseFragment {
             public void onChanged(JsonRootBean<PageData<Article>> pageDataJsonRootBean) {
                 if (pageDataJsonRootBean != null) {
                     mAdapter.setNewData(pageDataJsonRootBean.getData().getDatas());
+                } else {
+                    mAdapter.setEmptyView(getEmptyDataView(mBinding.homeRecyclerView));
                 }
             }
         });
