@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +21,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //APP灰度设置（主要是设置饱和度，饱和度为0就是灰度，饱和度为1就是正常颜色）
+//        Paint paint = new Paint();
+//        ColorMatrix cm = new ColorMatrix();
+//        cm.setSaturation(0);
+//        paint.setColorFilter(new ColorMatrixColorFilter(cm));
+//        getWindow().getDecorView().setLayerType(View.LAYER_TYPE_HARDWARE, paint);
+
         setContentView(R.layout.activity_main);
 //        DataBindingUtil.setContentView(this, R.layout.activity_main);
 

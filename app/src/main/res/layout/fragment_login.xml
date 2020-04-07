@@ -3,12 +3,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragment.LoginFragment">
 
+    <data>
+
+        <variable
+            name="vm"
+            type="com.hy.wanandroid.ui.viewmodel.LoginViewModel" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:orientation="vertical">
 
+        <include
+            android:id="@+id/login_include"
+            layout="@layout/public_toolbar" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher_round" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/login_user_name_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@drawable/round_conner_transparent_bg"
+            android:hint="用户名"
+            android:padding="12dp"
+            android:text="@={vm.mUserName}"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/login_user_pwd_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@drawable/round_conner_transparent_bg"
+            android:hint="密码"
+            android:padding="12dp"
+            android:text="@={vm.mUserPwd}"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/login_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@drawable/round_conner_transparent_bg"
+            android:gravity="center"
+            android:onClick="@{(view)->vm.clickEvent(view)}"
+            android:padding="12dp"
+            android:text="登录"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/login_register_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="12dp"
+            android:autoLink="all"
+            android:onClick="@{(view)->vm.clickEvent(view)}"
+            android:padding="8dp"
+            android:text="注册"
+            android:textSize="14sp" />
     </LinearLayout>
 
 </layout>

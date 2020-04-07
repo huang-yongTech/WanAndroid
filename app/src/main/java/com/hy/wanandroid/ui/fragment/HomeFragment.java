@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -78,6 +79,7 @@ public class HomeFragment extends BaseFragment {
         mBinding = FragmentHomeBinding.bind(view);
         mBinding.setVm(mHomeViewModel);
 
+        initDrawer();
         initRefresh();
         initAdapter();
         initRecyclerView();
@@ -89,6 +91,19 @@ public class HomeFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         getData();
+    }
+
+    private void initDrawer() {
+        mHomeViewModel.mOpenDrawer.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    mBinding.homeDrawer.openDrawer(GravityCompat.START);
+                } else {
+                    mBinding.homeDrawer.closeDrawer(GravityCompat.START);
+                }
+            }
+        });
     }
 
     private void initAdapter() {

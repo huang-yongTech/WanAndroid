@@ -3,12 +3,16 @@ package com.hy.wanandroid.ui.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hy.wanandroid.library.util.BarUtils;
 import com.hy.wanandroid.ui.R;
+import com.hy.wanandroid.ui.databinding.FragmentLoginBinding;
+import com.hy.wanandroid.ui.viewmodel.LoginViewModel;
 
 /**
  * 登录界面
@@ -19,6 +23,9 @@ public class LoginFragment extends Fragment {
 
     private String mParam1;
     private String mParam2;
+
+    private FragmentLoginBinding mBinding;
+    private LoginViewModel mViewModel;
 
     public LoginFragment() {
     }
@@ -43,10 +50,18 @@ public class LoginFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mViewModel = new ViewModelProvider(getViewModelStore(), getDefaultViewModelProviderFactory())
+                .get(LoginViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
+        mBinding = FragmentLoginBinding.bind(view);
+        mBinding.setVm(mViewModel);
+
+        BarUtils.setAppToolBarMarginTop(getContext(), mBinding.loginInclude.publicToolbar);
+        return view;
     }
 }

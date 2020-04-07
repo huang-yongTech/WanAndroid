@@ -3,7 +3,10 @@ package com.hy.wanandroid.ui.viewmodel;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.core.view.GravityCompat;
+import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.Navigation;
 
@@ -22,6 +25,9 @@ import com.hy.wanandroid.ui.R;
 public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
 
+    //侧滑菜单打开标志
+    public final MutableLiveData<Boolean> mOpenDrawer = new MutableLiveData<>();
+
     public LiveData<JsonRootBean<PageData<Article>>> queryHomeArticleList(int page) {
         return RetrofitUtils.getInstance()
                 .getApiService(HomeApi.class)
@@ -37,7 +43,7 @@ public class HomeViewModel extends ViewModel {
     public void clickEvent(View view) {
         switch (view.getId()) {
             case R.id.public_menu_btn:
-                Toast.makeText(view.getContext(), "菜单点击事件", Toast.LENGTH_SHORT).show();
+                mOpenDrawer.setValue(true);
                 break;
             case R.id.public_search_btn:
                 Navigation.findNavController(view).navigate(R.id.action_home_fragment_to_search_fragment);

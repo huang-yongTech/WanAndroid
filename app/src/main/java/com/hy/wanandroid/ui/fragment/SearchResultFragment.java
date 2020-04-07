@@ -122,7 +122,7 @@ public class SearchResultFragment extends BaseFragment {
                 loadMore();
             }
         });
-        mAdapter.getLoadMoreModule().setAutoLoadMore(true);
+        mAdapter.getLoadMoreModule().setAutoLoadMore(false);
         //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
         mAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
     }
