@@ -11,13 +11,5 @@
         android:name="com.hy.wanandroid.ui.fragment.DrawerFragment"
         android:label="nav_fragment_drawer"
         tools:layout="@layout/fragment_drawer">
-
-        <action
-            android:id="@+id/action_drawer_to_login_fragment"
-            app:destination="@id/nav_login"
-            app:enterAnim="@anim/h_fragment_enter"
-            app:exitAnim="@anim/h_fragment_exit"
-            app:popEnterAnim="@anim/h_fragment_pop_enter"
-            app:popExitAnim="@anim/h_fragment_pop_exit" />
     </fragment>
 </navigation>

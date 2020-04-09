@@ -82,18 +82,10 @@
         </LinearLayout>
 
         <com.google.android.material.internal.ScrimInsetsFrameLayout
+            android:id="@+id/home_left_menu_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/home_left_menu_container"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/nav_drawer" />
-        </com.google.android.material.internal.ScrimInsetsFrameLayout>
+            android:fitsSystemWindows="true" />
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

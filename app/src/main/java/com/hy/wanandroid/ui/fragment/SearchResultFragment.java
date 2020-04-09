@@ -105,26 +105,28 @@ public class SearchResultFragment extends BaseFragment {
     }
 
     private void initRecyclerView() {
-        mBinding.searchResultRecyclerView.addItemDecoration(
-                new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
         mAdapter = new ArticleListAdapter();
-        mBinding.searchResultRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-
-            }
-        });
         Objects.requireNonNull(mAdapter.getLoadMoreModule()).setLoadMoreView(new CustomLoadMoreView());
+        //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
+        mAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
+
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 loadMore();
             }
         });
-        mAdapter.getLoadMoreModule().setAutoLoadMore(false);
-        //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
-        mAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
+
+            }
+        });
+
+        mBinding.searchResultRecyclerView.addItemDecoration(
+                new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
+        mBinding.searchResultRecyclerView.setAdapter(mAdapter);
     }
 
     /**
@@ -143,6 +145,10 @@ public class SearchResultFragment extends BaseFragment {
             public void onChanged(JsonRootBean<PageData<Article>> pageDataJsonRootBean) {
                 if (pageDataJsonRootBean != null) {
                     mAdapter.setNewData(pageDataJsonRootBean.getData().getDatas());
+
+                    if (pageDataJsonRootBean.getData().getPageCount() == 1) {
+                        Objects.requireNonNull(mAdapter.getLoadMoreModule()).loadMoreEnd();
+                    }
                 }
             }
         });
