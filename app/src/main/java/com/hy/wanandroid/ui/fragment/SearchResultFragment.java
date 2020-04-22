@@ -125,7 +125,7 @@ public class SearchResultFragment extends BaseFragment {
         });
 
         mBinding.searchResultRecyclerView.addItemDecoration(
-                new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
+                new LinearItemDecoration(requireContext(), LinearItemDecoration.VERTICAL));
         mBinding.searchResultRecyclerView.setAdapter(mAdapter);
     }
 

@@ -129,7 +129,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void initRecyclerView() {
-        mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(Objects.requireNonNull(getContext()), LinearItemDecoration.VERTICAL));
+        mBinding.homeRecyclerView.addItemDecoration(new LinearItemDecoration(requireContext(), LinearItemDecoration.VERTICAL));
         mBinding.homeRecyclerView.setAdapter(mAdapter);
     }
 
