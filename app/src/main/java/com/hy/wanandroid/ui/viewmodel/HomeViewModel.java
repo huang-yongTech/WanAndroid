@@ -43,7 +43,7 @@ public class HomeViewModel extends ViewModel {
     public void clickEvent(View view) {
         switch (view.getId()) {
             case R.id.public_menu_btn:
-                mOpenDrawer.setValue(true);
+
                 break;
             case R.id.public_search_btn:
                 Navigation.findNavController(view).navigate(R.id.action_home_fragment_to_search_fragment);
