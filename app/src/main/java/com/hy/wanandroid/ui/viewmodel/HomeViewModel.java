@@ -42,11 +42,13 @@ public class HomeViewModel extends ViewModel {
      */
     public void clickEvent(View view) {
         switch (view.getId()) {
-            case R.id.public_menu_btn:
-
+            case R.id.home_menu_btn:
+                mOpenDrawer.setValue(true);
                 break;
-            case R.id.public_search_btn:
+            case R.id.home_search_btn:
                 Navigation.findNavController(view).navigate(R.id.action_home_fragment_to_search_fragment);
+                //在界面跳转的时候，将侧滑栏状态设置为关闭状态，避免在重新返回该界面是侧滑栏因为是打开状态而自动打开
+                mOpenDrawer.setValue(false);
                 break;
         }
     }
