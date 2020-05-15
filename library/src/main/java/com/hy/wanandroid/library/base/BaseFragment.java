@@ -47,7 +47,7 @@ public abstract class BaseFragment extends Fragment {
         if (mStatusBarView == null) {
             mStatusBarView = new View(getContext());
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
-            int statusBarHeight = BarUtils.getStatusBarHeight(Objects.requireNonNull(getContext()));
+            int statusBarHeight = BarUtils.getStatusBarHeight(requireContext());
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(screenWidth, statusBarHeight);
             mStatusBarView.setLayoutParams(params);
             mStatusBarView.setBackgroundColor(Color.BLACK);
