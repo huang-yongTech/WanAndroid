@@ -62,6 +62,9 @@ dependencies {
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$rootProject.baseRecyclerViewAdapterHelperVersion"
     implementation "com.youth.banner:banner:$rootProject.bannerVersion"
 
+    //内存泄漏检测
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$rootProject.leakcanaryVersion"
+
 //    implementation "org.webrtc:google-webrtc:$rootProject.webrtcVersion"
 //    implementation "io.socket:socket.io-client:$rootProject.socketIOversion"
 

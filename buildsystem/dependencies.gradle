@@ -47,7 +47,7 @@ ext {
     socketIOversion = '1.0.0'
 
     //内存泄漏检测
-    leakcanaryVersion = '1.6.3'
+    leakcanaryVersion = '2.3'
 
     //Testing
     junitVersion = '4.12'
