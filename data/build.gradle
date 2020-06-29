@@ -3,18 +3,16 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    def globalConfiguration = rootProject.extensions.getByName("ext")
-
-    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
-    buildToolsVersion globalConfiguration["androidBuildToolVersion"]
+    compileSdkVersion Deps.androidCompileSdkVersion
+    buildToolsVersion Deps.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion globalConfiguration["androidMinSdkVersion"]
-        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
-        versionCode globalConfiguration["androidVersionCode"]
-        versionName globalConfiguration["androidVersionName"]
+        minSdkVersion Deps.androidMinSdkVersion
+        targetSdkVersion Deps.androidTargetSdkVersion
+        versionCode Deps.androidVersionCode
+        versionName Deps.androidVersionName
 
-        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        testInstrumentationRunner Deps.testInstrumentationRunner
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -39,17 +37,17 @@ dependencies {
 
     implementation project(path: ':base')
 
-    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
+    implementation Deps.roomVersion
+    annotationProcessor Deps.roomCompilerVersion
 
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"
-    implementation "com.squareup.okhttp3:okhttp:$rootProject.okHttpVersion"
-    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.adapterRxjavaVersion"
-    implementation "com.squareup.retrofit2:converter-gson:$rootProject.converterGsonVersion"
+    implementation Deps.rxJavaVersion
+    implementation Deps.rxAndroidVersion
+    implementation Deps.okHttpVersion
+    implementation Deps.retrofitVersion
+    implementation Deps.adapterRxjavaVersion
+    implementation Deps.converterGsonVersion
 
-    implementation "androidx.core:core-ktx:$rootProject.ktxCoreVersion"
+    implementation Deps.ktxCoreVersion
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testImplementation 'junit:junit:4.12'

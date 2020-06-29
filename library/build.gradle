@@ -1,18 +1,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    def globalConfiguration = rootProject.extensions.getByName("ext")
-
-    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
-    buildToolsVersion globalConfiguration["androidBuildToolVersion"]
+    compileSdkVersion Deps.androidCompileSdkVersion
+    buildToolsVersion Deps.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion globalConfiguration["androidMinSdkVersion"]
-        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
-        versionCode globalConfiguration["androidVersionCode"]
-        versionName globalConfiguration["androidVersionName"]
+        minSdkVersion Deps.androidMinSdkVersion
+        targetSdkVersion Deps.androidTargetSdkVersion
+        versionCode Deps.androidVersionCode
+        versionName Deps.androidVersionName
 
-        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        testInstrumentationRunner Deps.testInstrumentationRunner
     }
 
     buildTypes {
@@ -33,13 +31,13 @@ dependencies {
 
     implementation project(path: ':base')
 
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"
-    implementation "com.squareup.okhttp3:okhttp:$rootProject.okHttpVersion"
-    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.adapterRxjavaVersion"
-    implementation "com.squareup.retrofit2:converter-gson:$rootProject.converterGsonVersion"
-    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:$rootProject.baseRecyclerViewAdapterHelperVersion"
+    implementation Deps.rxJavaVersion
+    implementation Deps.rxAndroidVersion
+    implementation Deps.okHttpVersion
+    implementation Deps.retrofitVersion
+    implementation Deps.adapterRxjavaVersion
+    implementation Deps.converterGsonVersion
+    implementation Deps.baseRecyclerViewAdapterHelperVersion
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

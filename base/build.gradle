@@ -1,18 +1,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    def globalConfiguration = rootProject.extensions.getByName("ext")
-
-    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
-    buildToolsVersion globalConfiguration["androidBuildToolVersion"]
+    compileSdkVersion Deps.androidCompileSdkVersion
+    buildToolsVersion Deps.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion globalConfiguration["androidMinSdkVersion"]
-        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
-        versionCode globalConfiguration["androidVersionCode"]
-        versionName globalConfiguration["androidVersionName"]
+        minSdkVersion Deps.androidMinSdkVersion
+        targetSdkVersion Deps.androidTargetSdkVersion
+        versionCode Deps.androidVersionCode
+        versionName Deps.androidVersionName
 
-        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        testInstrumentationRunner Deps.testInstrumentationRunner
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -27,19 +25,19 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    api "com.google.android.material:material:$rootProject.materialVersion"
-    api "androidx.legacy:legacy-support-v4:$rootProject.supportV4Version"
+    api Deps.appcompatVersion
+    api Deps.materialVersion
+    api Deps.supportV4Version
 
-    api "androidx.navigation:navigation-fragment:$rootProject.navigationVersion"
-    api "androidx.navigation:navigation-ui:$rootProject.navigationVersion"
+    api Deps.navigationFragmentVersion
+    api Deps.navigationUiVersion
 
-    api "androidx.lifecycle:lifecycle-viewmodel:$rootProject.lifecycleVersion"
-    api "androidx.lifecycle:lifecycle-livedata:$rootProject.lifecycleVersion"
-    api "androidx.lifecycle:lifecycle-runtime:$rootProject.lifecycleVersion"
-    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:$rootProject.lifecycleVersion"
-    api "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
-    api "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
+    api Deps.lifecycleViewModelVersion
+    api Deps.lifecycleLiveDataVersion
+    api Deps.lifecycleRuntimeVersion
+    api Deps.lifecycleViewModelSaveStateVersion
+    api Deps.lifecycleCommonJava8Version
+    api Deps.constraintLayoutVersion
 
-    api "androidx.paging:paging-runtime:$rootProject.pagingVersion"
+    api Deps.pagingVersion
 }
