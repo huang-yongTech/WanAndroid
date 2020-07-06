@@ -8,6 +8,8 @@ import androidx.core.view.GravityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
+import android.view.Choreographer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 首页fragment
@@ -78,6 +81,28 @@ public class HomeFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mBinding = FragmentHomeBinding.bind(view);
         mBinding.setVm(mHomeViewModel);
+
+        //通过Choreographer来监控卡顿，主要是通过在doFrame方法中统计该方法前后两次执行时间间隔是否超过16.6ms，
+        //进而来判断是否发生丢帧现象，如果发生丢帧，则可能会出现卡顿现象
+//        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
+//            long lastFrameTimeNanos = 0L;
+//
+//            @Override
+//            public void doFrame(long frameTimeNanos) {
+//                Log.i(TAG, "----doFrame----");
+//
+//                if (lastFrameTimeNanos != 0L) {
+//                    long diffTimeNanos = TimeUnit.MILLISECONDS.convert(frameTimeNanos - lastFrameTimeNanos,
+//                            TimeUnit.NANOSECONDS);
+//                    if (diffTimeNanos > 16.6f) {
+//                        Log.i(TAG, "doFrame: 发生丢帧");
+//                    }
+//                }
+//                lastFrameTimeNanos = frameTimeNanos;
+//
+//                Choreographer.getInstance().postFrameCallback(this);
+//            }
+//        });
 
         initDrawer();
         initRefresh();
