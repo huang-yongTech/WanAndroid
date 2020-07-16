@@ -56,7 +56,6 @@ dependencies {
     implementation project(path: ':library')
 
     implementation Deps.roomVersion
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     annotationProcessor Deps.roomCompilerVersion
 
     implementation Deps.flexBoxVersion
