@@ -13,6 +13,16 @@ android {
 
         testInstrumentationRunner Deps.testInstrumentationRunner
     }
+
+    signingConfigs {
+        debug {
+            keyAlias 'release-key'
+            keyPassword '1990huang'
+            storeFile file('../keystore/release-keystore.jks')
+            storePassword '1990huang'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,6 +30,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            signingConfig signingConfigs.debug
+
             minifyEnabled false
             zipAlignEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
