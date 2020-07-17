@@ -81,6 +81,7 @@ public class HomeFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         mBinding = FragmentHomeBinding.bind(view);
         mBinding.setVm(mHomeViewModel);
+        mBinding.setLifecycleOwner(this);
 
         //通过Choreographer来监控卡顿，主要是通过在doFrame方法中统计该方法前后两次执行时间间隔是否超过16.6ms，
         //进而来判断是否发生丢帧现象，如果发生丢帧，则可能会出现卡顿现象
