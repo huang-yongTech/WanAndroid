@@ -15,7 +15,7 @@ android {
     }
 
     signingConfigs {
-        debug {
+        debugger {
             keyAlias 'release-key'
             keyPassword '1990huang'
             storeFile file('../keystore/release-keystore.jks')
@@ -30,7 +30,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.debugger
 
             minifyEnabled false
             zipAlignEnabled false
