@@ -99,6 +99,9 @@ public class SearchFragment extends BaseFragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mBinding.searchKeyWordEt.setSelected(!TextUtils.isEmpty(s));
+                if (mBinding.searchKeyWordEt.getText() != null) {
+                    mBinding.searchKeyWordEt.setSelection(mBinding.searchKeyWordEt.getText().length());
+                }
                 mSearchViewModel.mSearchEnabled.set(!TextUtils.isEmpty(s));
             }
 

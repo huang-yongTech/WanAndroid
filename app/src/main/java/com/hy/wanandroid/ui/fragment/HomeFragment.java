@@ -49,6 +49,8 @@ public class HomeFragment extends BaseFragment {
     private FragmentHomeBinding mBinding;
     private ArticleListAdapter mAdapter;
 
+    private int currPage = 0;
+
     public HomeFragment() {
     }
 
@@ -149,7 +151,7 @@ public class HomeFragment extends BaseFragment {
                 loadMore();
             }
         });
-        mAdapter.getLoadMoreModule().setAutoLoadMore(true);
+        Objects.requireNonNull(mAdapter.getLoadMoreModule()).setAutoLoadMore(true);
         //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
         mAdapter.getLoadMoreModule().setEnableLoadMoreIfNotFullPage(false);
     }
@@ -181,7 +183,8 @@ public class HomeFragment extends BaseFragment {
     protected void getData() {
         mAdapter.setEmptyView(getLoadingView(mBinding.homeRecyclerView));
 
-        mHomeViewModel.queryHomeArticleList(0).observe(getViewLifecycleOwner(), new Observer<JsonRootBean<PageData<Article>>>() {
+        currPage = 0;
+        mHomeViewModel.queryHomeArticleList(currPage).observe(getViewLifecycleOwner(), new Observer<JsonRootBean<PageData<Article>>>() {
             @Override
             public void onChanged(JsonRootBean<PageData<Article>> pageDataJsonRootBean) {
                 if (pageDataJsonRootBean != null) {
@@ -197,6 +200,17 @@ public class HomeFragment extends BaseFragment {
      * 上拉加载数据
      */
     private void loadMore() {
-
+        currPage++;
+        mHomeViewModel.queryHomeArticleList(currPage).observe(getViewLifecycleOwner(), new Observer<JsonRootBean<PageData<Article>>>() {
+            @Override
+            public void onChanged(JsonRootBean<PageData<Article>> pageDataJsonRootBean) {
+                if (pageDataJsonRootBean != null) {
+                    mAdapter.addData(pageDataJsonRootBean.getData().getDatas());
+                    Objects.requireNonNull(mAdapter.getLoadMoreModule()).loadMoreComplete();
+                } else {
+                    Objects.requireNonNull(mAdapter.getLoadMoreModule()).loadMoreEnd();
+                }
+            }
+        });
     }
 }

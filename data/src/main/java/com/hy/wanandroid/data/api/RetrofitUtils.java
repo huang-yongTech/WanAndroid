@@ -1,11 +1,16 @@
 package com.hy.wanandroid.data.api;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.hy.wanandroid.data.utils.LiveDataCallAdapterFactory;
 
 import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -38,6 +43,7 @@ public class RetrofitUtils {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(getHttpLoggingInterceptor(true))
                 .build();
         Retrofit retrofit = buildRetrofit(okHttpClient);
         return retrofit.create(clazz);
@@ -51,5 +57,26 @@ public class RetrofitUtils {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
+    }
+
+    /**
+     * 创建日志拦截器
+     *
+     * @param isShowBody false 防止上传writeTo重写两次
+     */
+    public static HttpLoggingInterceptor getHttpLoggingInterceptor(boolean isShowBody) {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(
+                new HttpLoggingInterceptor.Logger() {
+                    @Override
+                    public void log(@NonNull String message) {
+                        Log.v("OkHttp", "log = " + message);
+                    }
+                });
+        if (isShowBody) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        }
+        return loggingInterceptor;
     }
 }

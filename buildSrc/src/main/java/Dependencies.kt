@@ -94,6 +94,7 @@ object Deps {
     const val rxAndroidVersion = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroidVersion}"
 
     const val okHttpVersion = "com.squareup.okhttp3:okhttp:${Versions.okHttpVersion}"
+    const val okHttpLogVersion = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttpVersion}"
     const val retrofitVersion = "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
     const val adapterRxjavaVersion = "com.squareup.retrofit2:adapter-rxjava2:${Versions.adapterRxjavaVersion}"
     const val converterGsonVersion = "com.squareup.retrofit2:converter-gson:${Versions.converterGsonVersion}"

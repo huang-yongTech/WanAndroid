@@ -43,6 +43,7 @@ dependencies {
     implementation Deps.rxJavaVersion
     implementation Deps.rxAndroidVersion
     implementation Deps.okHttpVersion
+    implementation Deps.okHttpLogVersion
     implementation Deps.retrofitVersion
     implementation Deps.adapterRxjavaVersion
     implementation Deps.converterGsonVersion
