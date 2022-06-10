@@ -1,158 +1,122 @@
-package com.hy.wanandroid.ui.fragment;
+package com.hy.wanandroid.ui.fragment
 
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.hy.wanandroid.data.bean.HotWord;
-import com.hy.wanandroid.data.bean.JsonListRootBean;
-import com.hy.wanandroid.library.base.BaseFragment;
-import com.hy.wanandroid.library.util.BarUtils;
-import com.hy.wanandroid.ui.R;
-import com.hy.wanandroid.ui.adapter.SearchKeyAdapter;
-import com.hy.wanandroid.ui.databinding.FragmentSearchBinding;
-import com.hy.wanandroid.ui.viewmodel.SearchViewModel;
-
-import java.util.List;
+import com.hy.wanandroid.library.base.BaseFragment
+import com.hy.wanandroid.ui.viewmodel.SearchViewModel
+import com.hy.wanandroid.ui.adapter.SearchKeyAdapter
+import android.os.Bundle
+import androidx.lifecycle.ViewModelProvider
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import com.hy.wanandroid.ui.R
+import com.hy.wanandroid.library.util.BarUtils
+import android.text.TextWatcher
+import android.text.Editable
+import android.text.TextUtils
+import android.view.View
+import androidx.lifecycle.Observer
+import com.hy.wanandroid.data.bean.HotWord
+import com.hy.wanandroid.ui.databinding.FragmentSearchBinding
 
 /**
  * 查找界面fragment
  */
-public class SearchFragment extends BaseFragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    private SearchViewModel mSearchViewModel;
-    private FragmentSearchBinding mBinding;
-
-    private SearchKeyAdapter mHistoryAdapter;
-    private SearchKeyAdapter mHotKeyAdapter;
-
-    public SearchFragment() {
+class SearchFragment : BaseFragment() {
+    private var mParam1: String? = null
+    private var mParam2: String? = null
+    private var mSearchViewModel: SearchViewModel? = null
+    private var mBinding: FragmentSearchBinding? = null
+    private var mHistoryAdapter: SearchKeyAdapter? = null
+    private var mHotKeyAdapter: SearchKeyAdapter? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mParam1 = arguments?.getString(ARG_PARAM1)
+        mParam2 = arguments?.getString(ARG_PARAM2)
+        mSearchViewModel = ViewModelProvider(this, defaultViewModelProviderFactory).get(
+            SearchViewModel::class.java
+        )
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     */
-    public static SearchFragment newInstance(String param1, String param2) {
-        SearchFragment fragment = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_search, container, false)
+        mBinding = FragmentSearchBinding.bind(view)
+        mBinding?.vm = mSearchViewModel
+        BarUtils.setAppToolBarMarginTop(context, mBinding!!.searchToolbar)
+        initView()
+        initAdapter()
+        return view
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getData()
+    }
+
+    private fun initView() {
+        mBinding?.searchKeyWordEt?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                mBinding?.searchKeyWordEt?.isSelected = !TextUtils.isEmpty(s)
+                if (mBinding?.searchKeyWordEt?.text != null) {
+                    mBinding?.searchKeyWordEt?.text?.length?.let {
+                        mBinding?.searchKeyWordEt?.setSelection(
+                            it
+                        )
+                    }
+                }
+                mSearchViewModel?.mSearchEnabled?.set(!TextUtils.isEmpty(s))
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+        clickRightClear(mBinding?.searchKeyWordEt)
+    }
+
+    private fun initAdapter() {
+        mHistoryAdapter = SearchKeyAdapter()
+        mBinding?.searchHistoryRecyclerView?.adapter = mHistoryAdapter
+        mHistoryAdapter?.setNewData(mSearchViewModel?.mHistoryKeyList?.get())
+        mHotKeyAdapter = SearchKeyAdapter()
+        mBinding?.searchHotWordRecyclerView?.adapter = mHotKeyAdapter
+        mHistoryAdapter?.setOnItemClickListener { adapter, view, position ->
+            val name = mHistoryAdapter?.data?.get(position)?.name
+            mSearchViewModel?.mSearchKey?.set(name)
         }
-
-        mSearchViewModel = new ViewModelProvider(this, getDefaultViewModelProviderFactory()).get(SearchViewModel.class);
+        mHotKeyAdapter?.setOnItemClickListener { adapter, view, position ->
+            val name = mHotKeyAdapter?.data?.get(position)?.name
+            mSearchViewModel?.mSearchKey?.set(name)
+        }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        mBinding = FragmentSearchBinding.bind(view);
-        mBinding.setVm(mSearchViewModel);
-        BarUtils.setAppToolBarMarginTop(getContext(), mBinding.searchToolbar);
-
-        initView();
-        initAdapter();
-        return view;
+    override fun getData() {
+        mSearchViewModel?.historyKey?.observe(
+            viewLifecycleOwner
+        ) { hotWords -> mHistoryAdapter?.setNewData(hotWords) }
+        mSearchViewModel?.hotWords?.observe(
+            viewLifecycleOwner
+        ) { hotWordJsonListRootBean ->
+            mHotKeyAdapter?.setNewData(hotWordJsonListRootBean?.data)
+        }
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    companion object {
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
 
-        getData();
-    }
-
-    private void initView() {
-        mBinding.searchKeyWordEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mBinding.searchKeyWordEt.setSelected(!TextUtils.isEmpty(s));
-                if (mBinding.searchKeyWordEt.getText() != null) {
-                    mBinding.searchKeyWordEt.setSelection(mBinding.searchKeyWordEt.getText().length());
-                }
-                mSearchViewModel.mSearchEnabled.set(!TextUtils.isEmpty(s));
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        clickRightClear(mBinding.searchKeyWordEt);
-    }
-
-    private void initAdapter() {
-        mHistoryAdapter = new SearchKeyAdapter();
-        mBinding.searchHistoryRecyclerView.setAdapter(mHistoryAdapter);
-        mHistoryAdapter.setNewData(mSearchViewModel.mHistoryKeyList.get());
-
-        mHotKeyAdapter = new SearchKeyAdapter();
-        mBinding.searchHotWordRecyclerView.setAdapter(mHotKeyAdapter);
-
-        mHistoryAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-                String name = mHistoryAdapter.getData().get(position).getName();
-                mSearchViewModel.mSearchKey.set(name);
-            }
-        });
-        mHotKeyAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull BaseQuickAdapter adapter, @NonNull View view, int position) {
-                String name = mHotKeyAdapter.getData().get(position).getName();
-                mSearchViewModel.mSearchKey.set(name);
-            }
-        });
-    }
-
-    @Override
-    protected void getData() {
-        mSearchViewModel.getHistoryKey().observe(getViewLifecycleOwner(), new Observer<List<HotWord>>() {
-            @Override
-            public void onChanged(List<HotWord> hotWords) {
-                mHistoryAdapter.setNewData(hotWords);
-            }
-        });
-
-        mSearchViewModel.getHotWords().observe(getViewLifecycleOwner(), new Observer<JsonListRootBean<HotWord>>() {
-            @Override
-            public void onChanged(JsonListRootBean<HotWord> hotWordJsonListRootBean) {
-                if (hotWordJsonListRootBean != null) {
-                    mHotKeyAdapter.setNewData(hotWordJsonListRootBean.getData());
-                }
-            }
-        });
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         */
+        fun newInstance(param1: String?, param2: String?): SearchFragment {
+            val fragment = SearchFragment()
+            val args = Bundle()
+            args.putString(ARG_PARAM1, param1)
+            args.putString(ARG_PARAM2, param2)
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

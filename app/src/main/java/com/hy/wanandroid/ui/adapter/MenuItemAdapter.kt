@@ -1,40 +1,32 @@
-package com.hy.wanandroid.ui.adapter;
+package com.hy.wanandroid.ui.adapter
 
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.viewholder.BaseViewHolder;
-import com.hy.wanandroid.data.bean.MenuItem;
-import com.hy.wanandroid.ui.R;
-import com.hy.wanandroid.ui.databinding.ItemMenuLayoutBinding;
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.hy.wanandroid.ui.R
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import com.hy.wanandroid.data.bean.MenuItem
+import com.hy.wanandroid.ui.databinding.ItemMenuLayoutBinding
 
 /**
  * author：created by huangyong on 2020/4/7 11:55
  * email：756655135@qq.com
  * description :
  */
-public class MenuItemAdapter extends BaseQuickAdapter<MenuItem, BaseViewHolder> {
-    public MenuItemAdapter() {
-        super(R.layout.item_menu_layout);
+class MenuItemAdapter : BaseQuickAdapter<MenuItem?, BaseViewHolder>(R.layout.item_menu_layout) {
+    override fun onItemViewHolderCreated(viewHolder: BaseViewHolder, viewType: Int) {
+        super.onItemViewHolderCreated(viewHolder, viewType)
+        DataBindingUtil.bind<ViewDataBinding>(viewHolder.itemView)
     }
 
-    @Override
-    protected void onItemViewHolderCreated(@NonNull BaseViewHolder viewHolder, int viewType) {
-        super.onItemViewHolderCreated(viewHolder, viewType);
-        DataBindingUtil.bind(viewHolder.itemView);
-    }
-
-    @Override
-    protected void convert(@NonNull BaseViewHolder baseViewHolder, MenuItem menuItem) {
-        if (menuItem == null) {
-            return;
+    override fun convert(helper: BaseViewHolder, item: MenuItem?) {
+        if (item == null) {
+            return
         }
-
-        ItemMenuLayoutBinding binding = baseViewHolder.getBinding();
+        val binding: ItemMenuLayoutBinding? = helper.getBinding()
         if (binding != null) {
-            binding.setMenu(menuItem);
-            binding.executePendingBindings();
+            binding.menu = item
+            binding.executePendingBindings()
         }
     }
 }

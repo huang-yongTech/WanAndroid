@@ -1,67 +1,60 @@
-package com.hy.wanandroid.ui.fragment;
+package com.hy.wanandroid.ui.fragment
 
-import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.hy.wanandroid.library.util.BarUtils;
-import com.hy.wanandroid.ui.R;
-import com.hy.wanandroid.ui.databinding.FragmentLoginBinding;
-import com.hy.wanandroid.ui.viewmodel.LoginViewModel;
+import com.hy.wanandroid.ui.viewmodel.LoginViewModel
+import android.os.Bundle
+import com.hy.wanandroid.ui.fragment.LoginFragment
+import androidx.lifecycle.ViewModelProvider
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.hy.wanandroid.ui.R
+import com.hy.wanandroid.library.util.BarUtils
+import com.hy.wanandroid.ui.databinding.FragmentLoginBinding
 
 /**
  * 登录界面
  */
-public class LoginFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    private FragmentLoginBinding mBinding;
-    private LoginViewModel mViewModel;
-
-    public LoginFragment() {
+class LoginFragment : Fragment() {
+    private var mParam1: String? = null
+    private var mParam2: String? = null
+    private var mBinding: FragmentLoginBinding? = null
+    private var mViewModel: LoginViewModel? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mParam1 = arguments?.getString(ARG_PARAM1)
+        mParam2 = arguments?.getString(ARG_PARAM2)
+        mViewModel = ViewModelProvider(viewModelStore, defaultViewModelProviderFactory)
+            .get(LoginViewModel::class.java)
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     */
-    public static LoginFragment newInstance(String param1, String param2) {
-        LoginFragment fragment = new LoginFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_login, container, false)
+        mBinding = FragmentLoginBinding.bind(view)
+        mBinding?.vm = mViewModel
+        BarUtils.setAppToolBarMarginTop(context, mBinding!!.loginInclude.publicToolbar)
+        return view
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    companion object {
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
+
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         */
+        fun newInstance(param1: String?, param2: String?): LoginFragment {
+            val fragment = LoginFragment()
+            val args = Bundle()
+            args.putString(ARG_PARAM1, param1)
+            args.putString(ARG_PARAM2, param2)
+            fragment.arguments = args
+            return fragment
         }
-
-        mViewModel = new ViewModelProvider(getViewModelStore(), getDefaultViewModelProviderFactory())
-                .get(LoginViewModel.class);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
-        mBinding = FragmentLoginBinding.bind(view);
-        mBinding.setVm(mViewModel);
-
-        BarUtils.setAppToolBarMarginTop(getContext(), mBinding.loginInclude.publicToolbar);
-        return view;
     }
 }

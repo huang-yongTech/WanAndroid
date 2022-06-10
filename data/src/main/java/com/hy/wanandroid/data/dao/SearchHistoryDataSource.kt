@@ -1,45 +1,34 @@
-package com.hy.wanandroid.data.dao;
+package com.hy.wanandroid.data.dao
 
-import android.app.Application;
-
-import androidx.lifecycle.LiveData;
-
-import com.hy.wanandroid.data.bean.HotWord;
-
-import java.util.List;
+import android.app.Application
+import androidx.lifecycle.LiveData
+import com.hy.wanandroid.data.bean.HotWord
+import androidx.lifecycle.MutableLiveData
 
 /**
  * author：created by huangyong on 2020/4/1 17:13
  * email：756655135@qq.com
  * description :
  */
-public class SearchHistoryDataSource {
-    private SearchHistoryDao historyDao;
-
-    public SearchHistoryDataSource(Application application) {
-        AppDatabase database = AppDatabase.getInstance(application);
-        historyDao = database.historyDao();
+class SearchHistoryDataSource(application: Application) {
+    private val historyDao: SearchHistoryDao?
+    fun insertSearchKey(hotWord: HotWord?) {
+        AppDatabase.DATABASE_WRITE_EXECUTOR?.execute {
+            historyDao?.insertKey(
+                hotWord
+            )
+        }
     }
 
-    public void insertSearchKey(final HotWord hotWord) {
-        AppDatabase.DATABASE_WRITE_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                historyDao.insertKey(hotWord);
-            }
-        });
+    fun deleteKeys() {
+        AppDatabase.DATABASE_WRITE_EXECUTOR?.execute { historyDao?.deleteKeys() }
     }
 
-    public void deleteKeys() {
-        AppDatabase.DATABASE_WRITE_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                historyDao.deleteKeys();
-            }
-        });
-    }
+    val historyKey: LiveData<MutableList<HotWord?>?>?
+        get() = historyDao?.historyKey
 
-    public LiveData<List<HotWord>> getHistoryKey() {
-        return historyDao.getHistoryKey();
+    init {
+        val database: AppDatabase? = AppDatabase.getInstance(application)
+        historyDao = database?.historyDao()
     }
 }

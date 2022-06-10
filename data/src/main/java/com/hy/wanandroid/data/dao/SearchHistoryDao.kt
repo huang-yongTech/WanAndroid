@@ -1,14 +1,8 @@
-package com.hy.wanandroid.data.dao;
+package com.hy.wanandroid.data.dao
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import com.hy.wanandroid.data.bean.HotWord;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import com.hy.wanandroid.data.bean.HotWord
+import androidx.room.*
 
 /**
  * author：created by huangyong on 2020/4/1 15:58
@@ -16,13 +10,13 @@ import java.util.List;
  * description :
  */
 @Dao
-public interface SearchHistoryDao {
+interface SearchHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertKey(HotWord hotWord);
+    fun insertKey(hotWord: HotWord?)
 
     @Query("delete from hot_word")
-    void deleteKeys();
+    fun deleteKeys()
 
-    @Query("select * from hot_word")
-    LiveData<List<HotWord>> getHistoryKey();
+    @get:Query("select * from hot_word")
+    val historyKey: LiveData<MutableList<HotWord?>?>?
 }

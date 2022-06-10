@@ -1,98 +1,85 @@
-package com.hy.wanandroid.data.api;
+package com.hy.wanandroid.data.api
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Set;
-
-import okhttp3.Headers;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.Buffer;
-import okio.BufferedSource;
+import android.util.Log
+import okhttp3.*
+import okio.Buffer
+import java.io.IOException
+import java.lang.StringBuilder
+import java.nio.charset.StandardCharsets
+import java.nio.charset.UnsupportedCharsetException
 
 /**
  * author : yonghuang5
  * date : 2022/2/14 13:52
  * description :
  */
-public class LoggingInterceptor implements Interceptor {
-    Charset UTF8 = StandardCharsets.UTF_8;
-
-    @NonNull
-    @Override
-    public Response intercept(@NonNull Chain chain) throws IOException {
-        Request request = chain.request();
-        Headers headers = request.headers();
-        Set<String> names = headers.names();
-        StringBuilder headMap = new StringBuilder();
-        if (names.size() > 0) {
-            for (String key : names) {
-                String value = headers.get(key);
+class LoggingInterceptor : Interceptor {
+    var UTF8 = StandardCharsets.UTF_8
+    @kotlin.Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val headers = request.headers()
+        val names = headers.names()
+        val headMap = StringBuilder()
+        if (names.size > 0) {
+            for (key in names) {
+                val value = headers[key!!]
                 headMap.append(" ")
-                        .append(key)
-                        .append(":")
-                        .append(value)
-                        .append(" ;");
+                    .append(key)
+                    .append(":")
+                    .append(value)
+                    .append(" ;")
             }
         }
-
-        String body = "";
-        RequestBody requestBody = request.body();
+        var body = ""
+        val requestBody = request.body()
         if (requestBody != null) {
-            Buffer buffer = new Buffer();
-            requestBody.writeTo(buffer);
-            Charset charset = UTF8;
-            MediaType contentType = requestBody.contentType();
+            val buffer = Buffer()
+            requestBody.writeTo(buffer)
+            var charset = UTF8
+            val contentType = requestBody.contentType()
             if (contentType != null) {
-                charset = contentType.charset(UTF8);
+                charset = contentType.charset(UTF8)
             }
             if (charset != null) {
-                body = buffer.readString(charset);
+                body = buffer.readString(charset)
             }
         }
         //继续前前进（开始请求）
-        long startTime = System.currentTimeMillis();
-        Response response = chain.proceed(request);
-
-        String res = "";
-        ResponseBody responseBody = response.body();
-        MediaType contentType = null;
+        val startTime = System.currentTimeMillis()
+        val response = chain.proceed(request)
+        var res = ""
+        val responseBody = response.body()
+        var contentType: MediaType? = null
         if (responseBody != null) {
-            contentType = responseBody.contentType();
+            contentType = responseBody.contentType()
         }
         if (contentType != null) {
-            Charset charset = UTF8;
+            var charset = UTF8
             try {
-                charset = contentType.charset(UTF8);
-            } catch (UnsupportedCharsetException e) {
-                e.printStackTrace();
+                charset = contentType.charset(UTF8)
+            } catch (e: UnsupportedCharsetException) {
+                e.printStackTrace()
             }
-            BufferedSource source = responseBody.source();
-            source.request(Long.MAX_VALUE);
-            Buffer buffer = source.buffer();
+            val source = responseBody!!.source()
+            source.request(Long.MAX_VALUE)
+            val buffer = source.buffer()
             if (charset != null) {
-                res = buffer.clone().readString(charset);
+                res = buffer.clone().readString(charset)
             }
         }
-
-        long time = System.currentTimeMillis() - startTime;
-        Log.e("--", "\n响应: code:" + response.code()
-                + "\nurl：" + response.request().url()
-                + "\nheads:" + headMap
-                + "\n请求：" + body
-                + "\n返回: " + res
-                + "\n响应时间：" + time + "毫秒");
-
-        return response;
+        val time = System.currentTimeMillis() - startTime
+        Log.e(
+            "--", """
+     
+     响应: code:${response.code()}
+     url：${response.request().url()}
+     heads:$headMap
+     请求：$body
+     返回: $res
+     响应时间：${time}毫秒
+     """.trimIndent()
+        )
+        return response
     }
 }

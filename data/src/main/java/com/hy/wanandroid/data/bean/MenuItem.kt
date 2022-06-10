@@ -1,37 +1,19 @@
-package com.hy.wanandroid.data.bean;
+package com.hy.wanandroid.data.bean
 
-import androidx.annotation.DrawableRes;
+import androidx.annotation.DrawableRes
 
 /**
  * author：created by huangyong on 2020/3/31 14:46
  * email：756655135@qq.com
  * description :
  */
-public class MenuItem {
-    private int iconId;
-    private String title;
+class MenuItem {
+    var iconId = 0
+    var title: String? = null
 
-    public MenuItem() {
-    }
-
-    public MenuItem(@DrawableRes int iconId, String title) {
-        this.iconId = iconId;
-        this.title = title;
-    }
-
-    public int getIconId() {
-        return iconId;
-    }
-
-    public void setIconId(@DrawableRes int iconId) {
-        this.iconId = iconId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    constructor() {}
+    constructor(@DrawableRes iconId: Int, title: String?) {
+        this.iconId = iconId
+        this.title = title
     }
 }

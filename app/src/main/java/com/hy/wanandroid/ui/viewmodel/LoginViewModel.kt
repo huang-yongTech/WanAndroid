@@ -1,33 +1,29 @@
-package com.hy.wanandroid.ui.viewmodel;
+package com.hy.wanandroid.ui.viewmodel
 
-import android.view.View;
-
-import androidx.databinding.ObservableField;
-import androidx.lifecycle.ViewModel;
-
-import com.hy.wanandroid.ui.R;
+import android.view.View
+import com.hy.wanandroid.ui.R
+import androidx.lifecycle.ViewModel
+import androidx.databinding.ObservableField
 
 /**
  * author：created by huangyong on 2020/4/7 15:58
  * email：756655135@qq.com
  * description :
  */
-public class LoginViewModel extends ViewModel {
+class LoginViewModel : ViewModel() {
     //用户民
-    public final ObservableField<String> mUserName = new ObservableField<>();
+    @JvmField
+    val mUserName = ObservableField<String>()
 
     //密码
-    public final ObservableField<String> mUserPwd = new ObservableField<>();
+    @JvmField
+    val mUserPwd = ObservableField<String>()
 
     //点击事件
-    public void clickEvent(View view) {
-        switch (view.getId()) {
-            case R.id.login_btn:
-
-                break;
-            case R.id.login_register_btn:
-
-                break;
+    fun clickEvent(view: View) {
+        when (view.id) {
+            R.id.login_btn -> {}
+            R.id.login_register_btn -> {}
         }
     }
 }

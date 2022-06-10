@@ -1,8 +1,8 @@
 object Versions {
     //android build
-    const val androidBuildToolVersion = "29.0.3"
-    const val androidCompileSdkVersion = 29
-    const val androidTargetSdkVersion = 29
+    const val androidBuildToolVersion = "30.0.3"
+    const val androidCompileSdkVersion = 31
+    const val androidTargetSdkVersion = 30
     const val androidMinSdkVersion = 21
     const val androidVersionCode = 1
     const val androidVersionName = "1.0"
@@ -20,7 +20,7 @@ object Versions {
     const val navigationVersion = "2.2.2"
     const val lifecycleVersion = "2.2.0"
     const val flexBoxVersion = "2.0.1"
-    const val roomVersion = "2.2.5"
+    const val roomVersion = "2.3.0"
     const val pagingVersion = "2.1.2"
 
     //third libraries
@@ -80,6 +80,7 @@ object Deps {
     const val pagingVersion = "androidx.paging:paging-runtime:${Versions.pagingVersion}"
     const val roomVersion = "androidx.room:room-runtime:${Versions.roomVersion}"
     const val roomCompilerVersion = "androidx.room:room-compiler:${Versions.roomVersion}"
+    const val roomKtxVersion = "androidx.room:room-ktx:${Versions.roomVersion}"
     const val flexBoxVersion = "com.google.android:flexbox:${Versions.flexBoxVersion}"
 
     const val ktxCoreVersion = "androidx.core:core-ktx:${Versions.ktxCoreVersion}"
