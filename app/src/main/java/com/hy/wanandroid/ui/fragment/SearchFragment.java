@@ -149,7 +149,9 @@ public class SearchFragment extends BaseFragment {
         mSearchViewModel.getHotWords().observe(getViewLifecycleOwner(), new Observer<JsonListRootBean<HotWord>>() {
             @Override
             public void onChanged(JsonListRootBean<HotWord> hotWordJsonListRootBean) {
-                mHotKeyAdapter.setNewData(hotWordJsonListRootBean.getData());
+                if (hotWordJsonListRootBean != null) {
+                    mHotKeyAdapter.setNewData(hotWordJsonListRootBean.getData());
+                }
             }
         });
     }

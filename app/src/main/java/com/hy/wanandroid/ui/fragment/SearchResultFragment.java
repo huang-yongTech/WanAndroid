@@ -149,6 +149,8 @@ public class SearchResultFragment extends BaseFragment {
                     if (pageDataJsonRootBean.getData().getPageCount() == 1) {
                         Objects.requireNonNull(mAdapter.getLoadMoreModule()).loadMoreEnd();
                     }
+                } else {
+                    mAdapter.setEmptyView(getEmptyDataView(mBinding.searchResultRecyclerView));
                 }
             }
         });
