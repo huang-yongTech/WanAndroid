@@ -7,9 +7,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/drawable/sample_loading_progress.xml" value="0.154" />
         <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/layout/fragment_bitmap.xml" value="0.11820652173913043" />
-        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/layout/fragment_home.xml" value="0.2726449275362319" />
+        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/layout/fragment_home.xml" value="0.14666666666666667" />
         <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/layout/fragment_search.xml" value="0.129981884057971" />
+        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/app/src/main/res/layout/item_article_layout.xml" value="0.11730072463768115" />
+        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/library/src/main/res/layout/view_loading.xml" value="0.1" />
+        <entry key="..\:/AndroidDev/AndroidStudioProject/WanAndroid/library/src/main/res/layout/view_pull_up_load_more.xml" value="0.1" />
       </map>
     </option>
   </component>
