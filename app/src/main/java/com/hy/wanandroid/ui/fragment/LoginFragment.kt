@@ -36,7 +36,7 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
         mBinding = FragmentLoginBinding.bind(view)
         mBinding?.vm = mViewModel
-        BarUtils.setAppToolBarMarginTop(context, mBinding!!.loginInclude.publicToolbar)
+        BarUtils.setAppToolBarMarginTop(requireContext(), mBinding!!.loginInclude.publicToolbar)
         return view
     }
 

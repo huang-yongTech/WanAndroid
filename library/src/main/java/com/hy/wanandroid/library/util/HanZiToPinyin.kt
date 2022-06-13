@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.hy.wanandroid.library.util
 
-package com.hy.wanandroid.library.util;
-
-import android.text.TextUtils;
-import android.util.Log;
-
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Locale;
+import android.text.TextUtils
+import android.util.Log
+import java.lang.StringBuilder
+import java.text.Collator
+import java.util.*
 
 /**
  * An object to convert Chinese character to its corresponding pinyin string.
@@ -31,21 +29,188 @@ import java.util.Locale;
  * runtime resources with tolerable sacrifice of accuracy. This implementation
  * highly depends on zh_CN ICU collation data and must be always synchronized
  * with ICU.
- * <p>
+ *
+ *
  * Currently this file is aligned to zh.txt in ICU 4.6 鏉ヨ嚜android4.2婧愮爜
  */
-public class HanZiToPinyin {
-    private static final String TAG = "HanZiToPinyin";
+class HanZiToPinyin private constructor(private val mHasChinaCollator: Boolean) {
+    class Token {
+        constructor() {}
+        constructor(type: Int, source: String?, target: String?) {
+            this.type = type
+            this.source = source
+            this.target = target
+        }
 
-    // Turn on this flag when we want to check internal data structure.
-    private static final boolean DEBUG = false;
+        /**
+         * Type of this token, ASCII, PINYIN or UNKNOWN.
+         */
+        var type = 0
+
+        /**
+         * Original string before translation.
+         */
+        var source: String? = null
+
+        /**
+         * Translated string of source. For Han, target is corresponding Pinyin.
+         * Otherwise target is original string in source.
+         */
+        var target: String? = null
+
+        companion object {
+            /**
+             * Separator between target string for each source char
+             */
+            const val SEPARATOR = " "
+            const val LATIN = 1
+            const val PINYIN = 2
+            const val UNKNOWN = 3
+        }
+    }
+
+    private fun getToken(character: Char): Token {
+        val token = Token()
+        val letter = character.toString()
+        token.source = letter
+        var offset = -1
+        var cmp: Int
+        if (character.toInt() < 256) {
+            token.type = Token.LATIN
+            token.target = letter
+            return token
+        } else {
+            cmp = COLLATOR.compare(letter, FIRST_PINYIN_UNIHAN)
+            if (cmp < 0) {
+                token.type = Token.UNKNOWN
+                token.target = letter
+                return token
+            } else if (cmp == 0) {
+                token.type = Token.PINYIN
+                offset = 0
+            } else {
+                cmp = COLLATOR.compare(letter, LAST_PINYIN_UNIHAN)
+                if (cmp > 0) {
+                    token.type = Token.UNKNOWN
+                    token.target = letter
+                    return token
+                } else if (cmp == 0) {
+                    token.type = Token.PINYIN
+                    offset = UNIHANS.size - 1
+                }
+            }
+        }
+        token.type = Token.PINYIN
+        if (offset < 0) {
+            var begin = 0
+            var end = UNIHANS.size - 1
+            while (begin <= end) {
+                offset = (begin + end) / 2
+                val unihan = UNIHANS[offset].toString()
+                cmp = COLLATOR.compare(letter, unihan)
+                if (cmp == 0) {
+                    break
+                } else if (cmp > 0) {
+                    begin = offset + 1
+                } else {
+                    end = offset - 1
+                }
+            }
+        }
+        if (cmp < 0) {
+            offset--
+        }
+        val pinyin = StringBuilder()
+        var j = 0
+        while (j < PINYINS[offset].size && PINYINS[offset][j].toInt() != 0) {
+            pinyin.append(PINYINS[offset][j].toChar())
+            j++
+        }
+        token.target = pinyin.toString()
+        if (TextUtils.isEmpty(token.target)) {
+            token.type = Token.UNKNOWN
+            token.target = token.source
+        }
+        return token
+    }
 
     /**
-     * Unihans array.
-     * <p>
-     * Each unihans is the first one within same pinyin when collator is zh_CN.
+     * Convert the input to a array of tokens. The sequence of ASCII or Unknown
+     * characters without space will be put into a Token, One Hanzi character
+     * which has pinyin will be treated as a Token. If these is no China
+     * collator, the empty token array is returned.
      */
-    private static final char[] UNIHANS = {'\u963f', '\u54ce', '\u5b89',
+    operator fun get(input: String): ArrayList<Token> {
+        val tokens = ArrayList<Token>()
+        if (!mHasChinaCollator || TextUtils.isEmpty(input)) {
+            // return empty tokens.
+            return tokens
+        }
+        val inputLength = input.length
+        val sb = StringBuilder()
+        var tokenType = Token.LATIN
+        // Go through the input, create a new token when
+        // a. Token type changed
+        // b. Get the Pinyin of current charater.
+        // c. current character is space.
+        for (i in 0 until inputLength) {
+            val character = input[i]
+            if (character == ' ') {
+                if (sb.length > 0) {
+                    addToken(sb, tokens, tokenType)
+                }
+            } else if (character.toInt() < 256) {
+                if (tokenType != Token.LATIN && sb.length > 0) {
+                    addToken(sb, tokens, tokenType)
+                }
+                tokenType = Token.LATIN
+                sb.append(character)
+            } else {
+                val t = getToken(character)
+                if (t.type == Token.PINYIN) {
+                    if (sb.length > 0) {
+                        addToken(sb, tokens, tokenType)
+                    }
+                    tokens.add(t)
+                    tokenType = Token.PINYIN
+                } else {
+                    if (tokenType != t.type && sb.length > 0) {
+                        addToken(sb, tokens, tokenType)
+                    }
+                    tokenType = t.type
+                    sb.append(character)
+                }
+            }
+        }
+        if (sb.length > 0) {
+            addToken(sb, tokens, tokenType)
+        }
+        return tokens
+    }
+
+    private fun addToken(
+        sb: StringBuilder,
+        tokens: ArrayList<Token>, tokenType: Int
+    ) {
+        val str = sb.toString()
+        tokens.add(Token(tokenType, str, str))
+        sb.setLength(0)
+    }
+
+    companion object {
+        private const val TAG = "HanZiToPinyin"
+
+        // Turn on this flag when we want to check internal data structure.
+        private const val DEBUG = false
+
+        /**
+         * Unihans array.
+         *
+         *
+         * Each unihans is the first one within same pinyin when collator is zh_CN.
+         */
+        private val UNIHANS = charArrayOf(
+            '\u963f', '\u54ce', '\u5b89',
             '\u80ae', '\u51f9', '\u516b', '\u6300', '\u6273', '\u90a6',
             '\u52f9', '\u9642', '\u5954', '\u4f3b', '\u5c44', '\u8fb9',
             '\u706c', '\u618b', '\u6c43', '\u51ab', '\u7676', '\u5cec',
@@ -116,456 +281,512 @@ public class HanZiToPinyin {
             '\u6731', '\u6293', '\u62fd', '\u4e13', '\u5986', '\u96b9',
             '\u5b92', '\u5353', '\u4e72', '\u5b97', '\u90b9', '\u79df',
             '\u94bb', '\u539c', '\u5c0a', '\u6628', '\u5159', '\u9fc3',
-            '\u9fc4',};
-
-    /**
-     * Pinyin array.
-     * <p>
-     * Each pinyin is corresponding to unihans of same offset in the unihans
-     * array.
-     */
-    private static final byte[][] PINYINS = {{65, 0, 0, 0, 0, 0},
-            {65, 73, 0, 0, 0, 0}, {65, 78, 0, 0, 0, 0},
-            {65, 78, 71, 0, 0, 0}, {65, 79, 0, 0, 0, 0},
-            {66, 65, 0, 0, 0, 0}, {66, 65, 73, 0, 0, 0},
-            {66, 65, 78, 0, 0, 0}, {66, 65, 78, 71, 0, 0},
-            {66, 65, 79, 0, 0, 0}, {66, 69, 73, 0, 0, 0},
-            {66, 69, 78, 0, 0, 0}, {66, 69, 78, 71, 0, 0},
-            {66, 73, 0, 0, 0, 0}, {66, 73, 65, 78, 0, 0},
-            {66, 73, 65, 79, 0, 0}, {66, 73, 69, 0, 0, 0},
-            {66, 73, 78, 0, 0, 0}, {66, 73, 78, 71, 0, 0},
-            {66, 79, 0, 0, 0, 0}, {66, 85, 0, 0, 0, 0},
-            {67, 65, 0, 0, 0, 0}, {67, 65, 73, 0, 0, 0},
-            {67, 65, 78, 0, 0, 0}, {67, 65, 78, 71, 0, 0},
-            {67, 65, 79, 0, 0, 0}, {67, 69, 0, 0, 0, 0},
-            {67, 69, 78, 0, 0, 0}, {67, 69, 78, 71, 0, 0},
-            {90, 69, 78, 71, 0, 0}, {67, 69, 78, 71, 0, 0},
-            {67, 72, 65, 0, 0, 0}, {67, 72, 65, 73, 0, 0},
-            {67, 72, 65, 78, 0, 0}, {67, 72, 65, 78, 71, 0},
-            {67, 72, 65, 79, 0, 0}, {67, 72, 69, 0, 0, 0},
-            {67, 72, 69, 78, 0, 0}, {83, 72, 69, 78, 0, 0},
-            {67, 72, 69, 78, 0, 0}, {67, 72, 69, 78, 71, 0},
-            {67, 72, 73, 0, 0, 0}, {67, 72, 79, 78, 71, 0},
-            {67, 72, 79, 85, 0, 0}, {67, 72, 85, 0, 0, 0},
-            {67, 72, 85, 65, 0, 0}, {67, 72, 85, 65, 73, 0},
-            {67, 72, 85, 65, 78, 0}, {67, 72, 85, 65, 78, 71},
-            {67, 72, 85, 73, 0, 0}, {67, 72, 85, 78, 0, 0},
-            {67, 72, 85, 79, 0, 0}, {67, 73, 0, 0, 0, 0},
-            {67, 79, 78, 71, 0, 0}, {67, 79, 85, 0, 0, 0},
-            {67, 85, 0, 0, 0, 0}, {67, 85, 65, 78, 0, 0},
-            {67, 85, 73, 0, 0, 0}, {67, 85, 78, 0, 0, 0},
-            {67, 85, 79, 0, 0, 0}, {68, 65, 0, 0, 0, 0},
-            {68, 65, 73, 0, 0, 0}, {68, 65, 78, 0, 0, 0},
-            {68, 65, 78, 71, 0, 0}, {68, 65, 79, 0, 0, 0},
-            {68, 69, 0, 0, 0, 0}, {68, 69, 78, 0, 0, 0},
-            {68, 69, 78, 71, 0, 0}, {68, 73, 0, 0, 0, 0},
-            {68, 73, 65, 0, 0, 0}, {68, 73, 65, 78, 0, 0},
-            {68, 73, 65, 79, 0, 0}, {68, 73, 69, 0, 0, 0},
-            {68, 73, 78, 71, 0, 0}, {68, 73, 85, 0, 0, 0},
-            {68, 79, 78, 71, 0, 0}, {68, 79, 85, 0, 0, 0},
-            {68, 85, 0, 0, 0, 0}, {68, 85, 65, 78, 0, 0},
-            {68, 85, 73, 0, 0, 0}, {68, 85, 78, 0, 0, 0},
-            {68, 85, 79, 0, 0, 0}, {69, 0, 0, 0, 0, 0},
-            {69, 73, 0, 0, 0, 0}, {69, 78, 0, 0, 0, 0},
-            {69, 78, 71, 0, 0, 0}, {69, 82, 0, 0, 0, 0},
-            {70, 65, 0, 0, 0, 0}, {70, 65, 78, 0, 0, 0},
-            {70, 65, 78, 71, 0, 0}, {70, 69, 73, 0, 0, 0},
-            {70, 69, 78, 0, 0, 0}, {70, 69, 78, 71, 0, 0},
-            {70, 73, 65, 79, 0, 0}, {70, 79, 0, 0, 0, 0},
-            {70, 79, 85, 0, 0, 0}, {70, 85, 0, 0, 0, 0},
-            {71, 65, 0, 0, 0, 0}, {71, 65, 73, 0, 0, 0},
-            {71, 65, 78, 0, 0, 0}, {71, 65, 78, 71, 0, 0},
-            {71, 65, 79, 0, 0, 0}, {71, 69, 0, 0, 0, 0},
-            {71, 69, 73, 0, 0, 0}, {71, 69, 78, 0, 0, 0},
-            {71, 69, 78, 71, 0, 0}, {71, 79, 78, 71, 0, 0},
-            {71, 79, 85, 0, 0, 0}, {71, 85, 0, 0, 0, 0},
-            {71, 85, 65, 0, 0, 0}, {71, 85, 65, 73, 0, 0},
-            {71, 85, 65, 78, 0, 0}, {71, 85, 65, 78, 71, 0},
-            {71, 85, 73, 0, 0, 0}, {71, 85, 78, 0, 0, 0},
-            {71, 85, 79, 0, 0, 0}, {72, 65, 0, 0, 0, 0},
-            {72, 65, 73, 0, 0, 0}, {72, 65, 78, 0, 0, 0},
-            {72, 65, 78, 71, 0, 0}, {72, 65, 79, 0, 0, 0},
-            {72, 69, 0, 0, 0, 0}, {72, 69, 73, 0, 0, 0},
-            {72, 69, 78, 0, 0, 0}, {72, 69, 78, 71, 0, 0},
-            {72, 77, 0, 0, 0, 0}, {72, 79, 78, 71, 0, 0},
-            {72, 79, 85, 0, 0, 0}, {72, 85, 0, 0, 0, 0},
-            {72, 85, 65, 0, 0, 0}, {72, 85, 65, 73, 0, 0},
-            {72, 85, 65, 78, 0, 0}, {72, 85, 65, 78, 71, 0},
-            {72, 85, 73, 0, 0, 0}, {72, 85, 78, 0, 0, 0},
-            {72, 85, 79, 0, 0, 0}, {74, 73, 0, 0, 0, 0},
-            {74, 73, 65, 0, 0, 0}, {74, 73, 65, 78, 0, 0},
-            {74, 73, 65, 78, 71, 0}, {74, 73, 65, 79, 0, 0},
-            {74, 73, 69, 0, 0, 0}, {74, 73, 78, 0, 0, 0},
-            {74, 73, 78, 71, 0, 0}, {74, 73, 79, 78, 71, 0},
-            {74, 73, 85, 0, 0, 0}, {74, 85, 0, 0, 0, 0},
-            {74, 85, 65, 78, 0, 0}, {74, 85, 69, 0, 0, 0},
-            {74, 85, 78, 0, 0, 0}, {75, 65, 0, 0, 0, 0},
-            {75, 65, 73, 0, 0, 0}, {75, 65, 78, 0, 0, 0},
-            {75, 65, 78, 71, 0, 0}, {75, 65, 79, 0, 0, 0},
-            {75, 69, 0, 0, 0, 0}, {75, 69, 78, 0, 0, 0},
-            {75, 69, 78, 71, 0, 0}, {75, 79, 78, 71, 0, 0},
-            {75, 79, 85, 0, 0, 0}, {75, 85, 0, 0, 0, 0},
-            {75, 85, 65, 0, 0, 0}, {75, 85, 65, 73, 0, 0},
-            {75, 85, 65, 78, 0, 0}, {75, 85, 65, 78, 71, 0},
-            {75, 85, 73, 0, 0, 0}, {75, 85, 78, 0, 0, 0},
-            {75, 85, 79, 0, 0, 0}, {76, 65, 0, 0, 0, 0},
-            {76, 65, 73, 0, 0, 0}, {76, 65, 78, 0, 0, 0},
-            {76, 65, 78, 71, 0, 0}, {76, 65, 79, 0, 0, 0},
-            {76, 69, 0, 0, 0, 0}, {76, 69, 73, 0, 0, 0},
-            {76, 69, 78, 71, 0, 0}, {76, 73, 0, 0, 0, 0},
-            {76, 73, 65, 0, 0, 0}, {76, 73, 65, 78, 0, 0},
-            {76, 73, 65, 78, 71, 0}, {76, 73, 65, 79, 0, 0},
-            {76, 73, 69, 0, 0, 0}, {76, 73, 78, 0, 0, 0},
-            {76, 73, 78, 71, 0, 0}, {76, 73, 85, 0, 0, 0},
-            {76, 79, 0, 0, 0, 0}, {76, 79, 78, 71, 0, 0},
-            {76, 79, 85, 0, 0, 0}, {76, 85, 0, 0, 0, 0},
-            {76, 85, 65, 78, 0, 0}, {76, 85, 69, 0, 0, 0},
-            {76, 85, 78, 0, 0, 0}, {76, 85, 79, 0, 0, 0},
-            {77, 0, 0, 0, 0, 0}, {77, 65, 0, 0, 0, 0},
-            {77, 65, 73, 0, 0, 0}, {77, 65, 78, 0, 0, 0},
-            {77, 65, 78, 71, 0, 0}, {77, 65, 79, 0, 0, 0},
-            {77, 69, 0, 0, 0, 0}, {77, 69, 73, 0, 0, 0},
-            {77, 69, 78, 0, 0, 0}, {77, 69, 78, 71, 0, 0},
-            {77, 73, 0, 0, 0, 0}, {77, 73, 65, 78, 0, 0},
-            {77, 73, 65, 79, 0, 0}, {77, 73, 69, 0, 0, 0},
-            {77, 73, 78, 0, 0, 0}, {77, 73, 78, 71, 0, 0},
-            {77, 73, 85, 0, 0, 0}, {77, 79, 0, 0, 0, 0},
-            {77, 79, 85, 0, 0, 0}, {77, 85, 0, 0, 0, 0},
-            {78, 0, 0, 0, 0, 0}, {78, 65, 0, 0, 0, 0},
-            {78, 65, 73, 0, 0, 0}, {78, 65, 78, 0, 0, 0},
-            {78, 65, 78, 71, 0, 0}, {78, 65, 79, 0, 0, 0},
-            {78, 69, 0, 0, 0, 0}, {78, 69, 73, 0, 0, 0},
-            {78, 69, 78, 0, 0, 0}, {78, 69, 78, 71, 0, 0},
-            {78, 73, 0, 0, 0, 0}, {78, 73, 65, 78, 0, 0},
-            {78, 73, 65, 78, 71, 0}, {78, 73, 65, 79, 0, 0},
-            {78, 73, 69, 0, 0, 0}, {78, 73, 78, 0, 0, 0},
-            {78, 73, 78, 71, 0, 0}, {78, 73, 85, 0, 0, 0},
-            {78, 79, 78, 71, 0, 0}, {78, 79, 85, 0, 0, 0},
-            {78, 85, 0, 0, 0, 0}, {78, 85, 65, 78, 0, 0},
-            {78, 85, 69, 0, 0, 0}, {78, 85, 78, 0, 0, 0},
-            {78, 85, 79, 0, 0, 0}, {79, 0, 0, 0, 0, 0},
-            {79, 85, 0, 0, 0, 0}, {80, 65, 0, 0, 0, 0},
-            {80, 65, 73, 0, 0, 0}, {80, 65, 78, 0, 0, 0},
-            {80, 65, 78, 71, 0, 0}, {80, 65, 79, 0, 0, 0},
-            {80, 69, 73, 0, 0, 0}, {80, 69, 78, 0, 0, 0},
-            {80, 69, 78, 71, 0, 0}, {80, 73, 0, 0, 0, 0},
-            {80, 73, 65, 78, 0, 0}, {80, 73, 65, 79, 0, 0},
-            {80, 73, 69, 0, 0, 0}, {80, 73, 78, 0, 0, 0},
-            {80, 73, 78, 71, 0, 0}, {80, 79, 0, 0, 0, 0},
-            {80, 79, 85, 0, 0, 0}, {80, 85, 0, 0, 0, 0},
-            {81, 73, 0, 0, 0, 0}, {81, 73, 65, 0, 0, 0},
-            {81, 73, 65, 78, 0, 0}, {81, 73, 65, 78, 71, 0},
-            {81, 73, 65, 79, 0, 0}, {81, 73, 69, 0, 0, 0},
-            {81, 73, 78, 0, 0, 0}, {81, 73, 78, 71, 0, 0},
-            {81, 73, 79, 78, 71, 0}, {81, 73, 85, 0, 0, 0},
-            {81, 85, 0, 0, 0, 0}, {81, 85, 65, 78, 0, 0},
-            {81, 85, 69, 0, 0, 0}, {81, 85, 78, 0, 0, 0},
-            {82, 65, 78, 0, 0, 0}, {82, 65, 78, 71, 0, 0},
-            {82, 65, 79, 0, 0, 0}, {82, 69, 0, 0, 0, 0},
-            {82, 69, 78, 0, 0, 0}, {82, 69, 78, 71, 0, 0},
-            {82, 73, 0, 0, 0, 0}, {82, 79, 78, 71, 0, 0},
-            {82, 79, 85, 0, 0, 0}, {82, 85, 0, 0, 0, 0},
-            {82, 85, 65, 0, 0, 0}, {82, 85, 65, 78, 0, 0},
-            {82, 85, 73, 0, 0, 0}, {82, 85, 78, 0, 0, 0},
-            {82, 85, 79, 0, 0, 0}, {83, 65, 0, 0, 0, 0},
-            {83, 65, 73, 0, 0, 0}, {83, 65, 78, 0, 0, 0},
-            {83, 65, 78, 71, 0, 0}, {83, 65, 79, 0, 0, 0},
-            {83, 69, 0, 0, 0, 0}, {83, 69, 78, 0, 0, 0},
-            {83, 69, 78, 71, 0, 0}, {83, 72, 65, 0, 0, 0},
-            {83, 72, 65, 73, 0, 0}, {83, 72, 65, 78, 0, 0},
-            {83, 72, 65, 78, 71, 0}, {83, 72, 65, 79, 0, 0},
-            {83, 72, 69, 0, 0, 0}, {83, 72, 69, 78, 0, 0},
-            {88, 73, 78, 0, 0, 0}, {83, 72, 69, 78, 0, 0},
-            {83, 72, 69, 78, 71, 0}, {83, 72, 73, 0, 0, 0},
-            {83, 72, 79, 85, 0, 0}, {83, 72, 85, 0, 0, 0},
-            {83, 72, 85, 65, 0, 0}, {83, 72, 85, 65, 73, 0},
-            {83, 72, 85, 65, 78, 0}, {83, 72, 85, 65, 78, 71},
-            {83, 72, 85, 73, 0, 0}, {83, 72, 85, 78, 0, 0},
-            {83, 72, 85, 79, 0, 0}, {83, 73, 0, 0, 0, 0},
-            {83, 79, 78, 71, 0, 0}, {83, 79, 85, 0, 0, 0},
-            {83, 85, 0, 0, 0, 0}, {83, 85, 65, 78, 0, 0},
-            {83, 85, 73, 0, 0, 0}, {83, 85, 78, 0, 0, 0},
-            {83, 85, 79, 0, 0, 0}, {84, 65, 0, 0, 0, 0},
-            {84, 65, 73, 0, 0, 0}, {84, 65, 78, 0, 0, 0},
-            {84, 65, 78, 71, 0, 0}, {84, 65, 79, 0, 0, 0},
-            {84, 69, 0, 0, 0, 0}, {84, 69, 78, 71, 0, 0},
-            {84, 73, 0, 0, 0, 0}, {84, 73, 65, 78, 0, 0},
-            {84, 73, 65, 79, 0, 0}, {84, 73, 69, 0, 0, 0},
-            {84, 73, 78, 71, 0, 0}, {84, 79, 78, 71, 0, 0},
-            {84, 79, 85, 0, 0, 0}, {84, 85, 0, 0, 0, 0},
-            {84, 85, 65, 78, 0, 0}, {84, 85, 73, 0, 0, 0},
-            {84, 85, 78, 0, 0, 0}, {84, 85, 79, 0, 0, 0},
-            {87, 65, 0, 0, 0, 0}, {87, 65, 73, 0, 0, 0},
-            {87, 65, 78, 0, 0, 0}, {87, 65, 78, 71, 0, 0},
-            {87, 69, 73, 0, 0, 0}, {87, 69, 78, 0, 0, 0},
-            {87, 69, 78, 71, 0, 0}, {87, 79, 0, 0, 0, 0},
-            {87, 85, 0, 0, 0, 0}, {88, 73, 0, 0, 0, 0},
-            {88, 73, 65, 0, 0, 0}, {88, 73, 65, 78, 0, 0},
-            {88, 73, 65, 78, 71, 0}, {88, 73, 65, 79, 0, 0},
-            {88, 73, 69, 0, 0, 0}, {88, 73, 78, 0, 0, 0},
-            {88, 73, 78, 71, 0, 0}, {88, 73, 79, 78, 71, 0},
-            {88, 73, 85, 0, 0, 0}, {88, 85, 0, 0, 0, 0},
-            {88, 85, 65, 78, 0, 0}, {88, 85, 69, 0, 0, 0},
-            {88, 85, 78, 0, 0, 0}, {89, 65, 0, 0, 0, 0},
-            {89, 65, 78, 0, 0, 0}, {89, 65, 78, 71, 0, 0},
-            {89, 65, 79, 0, 0, 0}, {89, 69, 0, 0, 0, 0},
-            {89, 73, 0, 0, 0, 0}, {89, 73, 78, 0, 0, 0},
-            {89, 73, 78, 71, 0, 0}, {89, 79, 0, 0, 0, 0},
-            {89, 79, 78, 71, 0, 0}, {89, 79, 85, 0, 0, 0},
-            {89, 85, 0, 0, 0, 0}, {89, 85, 65, 78, 0, 0},
-            {89, 85, 69, 0, 0, 0}, {89, 85, 78, 0, 0, 0},
-            {74, 85, 78, 0, 0, 0}, {89, 85, 78, 0, 0, 0},
-            {90, 65, 0, 0, 0, 0}, {90, 65, 73, 0, 0, 0},
-            {90, 65, 78, 0, 0, 0}, {90, 65, 78, 71, 0, 0},
-            {90, 65, 79, 0, 0, 0}, {90, 69, 0, 0, 0, 0},
-            {90, 69, 73, 0, 0, 0}, {90, 69, 78, 0, 0, 0},
-            {90, 69, 78, 71, 0, 0}, {90, 72, 65, 0, 0, 0},
-            {90, 72, 65, 73, 0, 0}, {90, 72, 65, 78, 0, 0},
-            {90, 72, 65, 78, 71, 0}, {67, 72, 65, 78, 71, 0},
-            {90, 72, 65, 78, 71, 0}, {90, 72, 65, 79, 0, 0},
-            {90, 72, 69, 0, 0, 0}, {90, 72, 69, 78, 0, 0},
-            {90, 72, 69, 78, 71, 0}, {90, 72, 73, 0, 0, 0},
-            {83, 72, 73, 0, 0, 0}, {90, 72, 73, 0, 0, 0},
-            {90, 72, 79, 78, 71, 0}, {90, 72, 79, 85, 0, 0},
-            {90, 72, 85, 0, 0, 0}, {90, 72, 85, 65, 0, 0},
-            {90, 72, 85, 65, 73, 0}, {90, 72, 85, 65, 78, 0},
-            {90, 72, 85, 65, 78, 71}, {90, 72, 85, 73, 0, 0},
-            {90, 72, 85, 78, 0, 0}, {90, 72, 85, 79, 0, 0},
-            {90, 73, 0, 0, 0, 0}, {90, 79, 78, 71, 0, 0},
-            {90, 79, 85, 0, 0, 0}, {90, 85, 0, 0, 0, 0},
-            {90, 85, 65, 78, 0, 0}, {90, 85, 73, 0, 0, 0},
-            {90, 85, 78, 0, 0, 0}, {90, 85, 79, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0}, {83, 72, 65, 78, 0, 0},
-            {0, 0, 0, 0, 0, 0},};
-
-    /**
-     * First and last Chinese character with known Pinyin according to zh
-     * collation
-     */
-    private static final String FIRST_PINYIN_UNIHAN = "\u963F";
-    private static final String LAST_PINYIN_UNIHAN = "\u9FFF";
-
-    private static final Collator COLLATOR = Collator.getInstance(Locale.CHINA);
-
-    private static HanZiToPinyin sInstance;
-    private final boolean mHasChinaCollator;
-
-    public static class Token {
-        /**
-         * Separator between target string for each source char
-         */
-        public static final String SEPARATOR = " ";
-
-        public static final int LATIN = 1;
-        public static final int PINYIN = 2;
-        public static final int UNKNOWN = 3;
-
-        public Token() {
-        }
-
-        public Token(int type, String source, String target) {
-            this.type = type;
-            this.source = source;
-            this.target = target;
-        }
+            '\u9fc4'
+        )
 
         /**
-         * Type of this token, ASCII, PINYIN or UNKNOWN.
+         * Pinyin array.
+         *
+         *
+         * Each pinyin is corresponding to unihans of same offset in the unihans
+         * array.
          */
-        public int type;
+        private val PINYINS = arrayOf(
+            byteArrayOf(65, 0, 0, 0, 0, 0),
+            byteArrayOf(65, 73, 0, 0, 0, 0),
+            byteArrayOf(65, 78, 0, 0, 0, 0),
+            byteArrayOf(65, 78, 71, 0, 0, 0),
+            byteArrayOf(65, 79, 0, 0, 0, 0),
+            byteArrayOf(66, 65, 0, 0, 0, 0),
+            byteArrayOf(66, 65, 73, 0, 0, 0),
+            byteArrayOf(66, 65, 78, 0, 0, 0),
+            byteArrayOf(66, 65, 78, 71, 0, 0),
+            byteArrayOf(66, 65, 79, 0, 0, 0),
+            byteArrayOf(66, 69, 73, 0, 0, 0),
+            byteArrayOf(66, 69, 78, 0, 0, 0),
+            byteArrayOf(66, 69, 78, 71, 0, 0),
+            byteArrayOf(66, 73, 0, 0, 0, 0),
+            byteArrayOf(66, 73, 65, 78, 0, 0),
+            byteArrayOf(66, 73, 65, 79, 0, 0),
+            byteArrayOf(66, 73, 69, 0, 0, 0),
+            byteArrayOf(66, 73, 78, 0, 0, 0),
+            byteArrayOf(66, 73, 78, 71, 0, 0),
+            byteArrayOf(66, 79, 0, 0, 0, 0),
+            byteArrayOf(66, 85, 0, 0, 0, 0),
+            byteArrayOf(67, 65, 0, 0, 0, 0),
+            byteArrayOf(67, 65, 73, 0, 0, 0),
+            byteArrayOf(67, 65, 78, 0, 0, 0),
+            byteArrayOf(67, 65, 78, 71, 0, 0),
+            byteArrayOf(67, 65, 79, 0, 0, 0),
+            byteArrayOf(67, 69, 0, 0, 0, 0),
+            byteArrayOf(67, 69, 78, 0, 0, 0),
+            byteArrayOf(67, 69, 78, 71, 0, 0),
+            byteArrayOf(90, 69, 78, 71, 0, 0),
+            byteArrayOf(67, 69, 78, 71, 0, 0),
+            byteArrayOf(67, 72, 65, 0, 0, 0),
+            byteArrayOf(67, 72, 65, 73, 0, 0),
+            byteArrayOf(67, 72, 65, 78, 0, 0),
+            byteArrayOf(67, 72, 65, 78, 71, 0),
+            byteArrayOf(67, 72, 65, 79, 0, 0),
+            byteArrayOf(67, 72, 69, 0, 0, 0),
+            byteArrayOf(67, 72, 69, 78, 0, 0),
+            byteArrayOf(83, 72, 69, 78, 0, 0),
+            byteArrayOf(67, 72, 69, 78, 0, 0),
+            byteArrayOf(67, 72, 69, 78, 71, 0),
+            byteArrayOf(67, 72, 73, 0, 0, 0),
+            byteArrayOf(67, 72, 79, 78, 71, 0),
+            byteArrayOf(67, 72, 79, 85, 0, 0),
+            byteArrayOf(67, 72, 85, 0, 0, 0),
+            byteArrayOf(67, 72, 85, 65, 0, 0),
+            byteArrayOf(67, 72, 85, 65, 73, 0),
+            byteArrayOf(67, 72, 85, 65, 78, 0),
+            byteArrayOf(67, 72, 85, 65, 78, 71),
+            byteArrayOf(67, 72, 85, 73, 0, 0),
+            byteArrayOf(67, 72, 85, 78, 0, 0),
+            byteArrayOf(67, 72, 85, 79, 0, 0),
+            byteArrayOf(67, 73, 0, 0, 0, 0),
+            byteArrayOf(67, 79, 78, 71, 0, 0),
+            byteArrayOf(67, 79, 85, 0, 0, 0),
+            byteArrayOf(67, 85, 0, 0, 0, 0),
+            byteArrayOf(67, 85, 65, 78, 0, 0),
+            byteArrayOf(67, 85, 73, 0, 0, 0),
+            byteArrayOf(67, 85, 78, 0, 0, 0),
+            byteArrayOf(67, 85, 79, 0, 0, 0),
+            byteArrayOf(68, 65, 0, 0, 0, 0),
+            byteArrayOf(68, 65, 73, 0, 0, 0),
+            byteArrayOf(68, 65, 78, 0, 0, 0),
+            byteArrayOf(68, 65, 78, 71, 0, 0),
+            byteArrayOf(68, 65, 79, 0, 0, 0),
+            byteArrayOf(68, 69, 0, 0, 0, 0),
+            byteArrayOf(68, 69, 78, 0, 0, 0),
+            byteArrayOf(68, 69, 78, 71, 0, 0),
+            byteArrayOf(68, 73, 0, 0, 0, 0),
+            byteArrayOf(68, 73, 65, 0, 0, 0),
+            byteArrayOf(68, 73, 65, 78, 0, 0),
+            byteArrayOf(68, 73, 65, 79, 0, 0),
+            byteArrayOf(68, 73, 69, 0, 0, 0),
+            byteArrayOf(68, 73, 78, 71, 0, 0),
+            byteArrayOf(68, 73, 85, 0, 0, 0),
+            byteArrayOf(68, 79, 78, 71, 0, 0),
+            byteArrayOf(68, 79, 85, 0, 0, 0),
+            byteArrayOf(68, 85, 0, 0, 0, 0),
+            byteArrayOf(68, 85, 65, 78, 0, 0),
+            byteArrayOf(68, 85, 73, 0, 0, 0),
+            byteArrayOf(68, 85, 78, 0, 0, 0),
+            byteArrayOf(68, 85, 79, 0, 0, 0),
+            byteArrayOf(69, 0, 0, 0, 0, 0),
+            byteArrayOf(69, 73, 0, 0, 0, 0),
+            byteArrayOf(69, 78, 0, 0, 0, 0),
+            byteArrayOf(69, 78, 71, 0, 0, 0),
+            byteArrayOf(69, 82, 0, 0, 0, 0),
+            byteArrayOf(70, 65, 0, 0, 0, 0),
+            byteArrayOf(70, 65, 78, 0, 0, 0),
+            byteArrayOf(70, 65, 78, 71, 0, 0),
+            byteArrayOf(70, 69, 73, 0, 0, 0),
+            byteArrayOf(70, 69, 78, 0, 0, 0),
+            byteArrayOf(70, 69, 78, 71, 0, 0),
+            byteArrayOf(70, 73, 65, 79, 0, 0),
+            byteArrayOf(70, 79, 0, 0, 0, 0),
+            byteArrayOf(70, 79, 85, 0, 0, 0),
+            byteArrayOf(70, 85, 0, 0, 0, 0),
+            byteArrayOf(71, 65, 0, 0, 0, 0),
+            byteArrayOf(71, 65, 73, 0, 0, 0),
+            byteArrayOf(71, 65, 78, 0, 0, 0),
+            byteArrayOf(71, 65, 78, 71, 0, 0),
+            byteArrayOf(71, 65, 79, 0, 0, 0),
+            byteArrayOf(71, 69, 0, 0, 0, 0),
+            byteArrayOf(71, 69, 73, 0, 0, 0),
+            byteArrayOf(71, 69, 78, 0, 0, 0),
+            byteArrayOf(71, 69, 78, 71, 0, 0),
+            byteArrayOf(71, 79, 78, 71, 0, 0),
+            byteArrayOf(71, 79, 85, 0, 0, 0),
+            byteArrayOf(71, 85, 0, 0, 0, 0),
+            byteArrayOf(71, 85, 65, 0, 0, 0),
+            byteArrayOf(71, 85, 65, 73, 0, 0),
+            byteArrayOf(71, 85, 65, 78, 0, 0),
+            byteArrayOf(71, 85, 65, 78, 71, 0),
+            byteArrayOf(71, 85, 73, 0, 0, 0),
+            byteArrayOf(71, 85, 78, 0, 0, 0),
+            byteArrayOf(71, 85, 79, 0, 0, 0),
+            byteArrayOf(72, 65, 0, 0, 0, 0),
+            byteArrayOf(72, 65, 73, 0, 0, 0),
+            byteArrayOf(72, 65, 78, 0, 0, 0),
+            byteArrayOf(72, 65, 78, 71, 0, 0),
+            byteArrayOf(72, 65, 79, 0, 0, 0),
+            byteArrayOf(72, 69, 0, 0, 0, 0),
+            byteArrayOf(72, 69, 73, 0, 0, 0),
+            byteArrayOf(72, 69, 78, 0, 0, 0),
+            byteArrayOf(72, 69, 78, 71, 0, 0),
+            byteArrayOf(72, 77, 0, 0, 0, 0),
+            byteArrayOf(72, 79, 78, 71, 0, 0),
+            byteArrayOf(72, 79, 85, 0, 0, 0),
+            byteArrayOf(72, 85, 0, 0, 0, 0),
+            byteArrayOf(72, 85, 65, 0, 0, 0),
+            byteArrayOf(72, 85, 65, 73, 0, 0),
+            byteArrayOf(72, 85, 65, 78, 0, 0),
+            byteArrayOf(72, 85, 65, 78, 71, 0),
+            byteArrayOf(72, 85, 73, 0, 0, 0),
+            byteArrayOf(72, 85, 78, 0, 0, 0),
+            byteArrayOf(72, 85, 79, 0, 0, 0),
+            byteArrayOf(74, 73, 0, 0, 0, 0),
+            byteArrayOf(74, 73, 65, 0, 0, 0),
+            byteArrayOf(74, 73, 65, 78, 0, 0),
+            byteArrayOf(74, 73, 65, 78, 71, 0),
+            byteArrayOf(74, 73, 65, 79, 0, 0),
+            byteArrayOf(74, 73, 69, 0, 0, 0),
+            byteArrayOf(74, 73, 78, 0, 0, 0),
+            byteArrayOf(74, 73, 78, 71, 0, 0),
+            byteArrayOf(74, 73, 79, 78, 71, 0),
+            byteArrayOf(74, 73, 85, 0, 0, 0),
+            byteArrayOf(74, 85, 0, 0, 0, 0),
+            byteArrayOf(74, 85, 65, 78, 0, 0),
+            byteArrayOf(74, 85, 69, 0, 0, 0),
+            byteArrayOf(74, 85, 78, 0, 0, 0),
+            byteArrayOf(75, 65, 0, 0, 0, 0),
+            byteArrayOf(75, 65, 73, 0, 0, 0),
+            byteArrayOf(75, 65, 78, 0, 0, 0),
+            byteArrayOf(75, 65, 78, 71, 0, 0),
+            byteArrayOf(75, 65, 79, 0, 0, 0),
+            byteArrayOf(75, 69, 0, 0, 0, 0),
+            byteArrayOf(75, 69, 78, 0, 0, 0),
+            byteArrayOf(75, 69, 78, 71, 0, 0),
+            byteArrayOf(75, 79, 78, 71, 0, 0),
+            byteArrayOf(75, 79, 85, 0, 0, 0),
+            byteArrayOf(75, 85, 0, 0, 0, 0),
+            byteArrayOf(75, 85, 65, 0, 0, 0),
+            byteArrayOf(75, 85, 65, 73, 0, 0),
+            byteArrayOf(75, 85, 65, 78, 0, 0),
+            byteArrayOf(75, 85, 65, 78, 71, 0),
+            byteArrayOf(75, 85, 73, 0, 0, 0),
+            byteArrayOf(75, 85, 78, 0, 0, 0),
+            byteArrayOf(75, 85, 79, 0, 0, 0),
+            byteArrayOf(76, 65, 0, 0, 0, 0),
+            byteArrayOf(76, 65, 73, 0, 0, 0),
+            byteArrayOf(76, 65, 78, 0, 0, 0),
+            byteArrayOf(76, 65, 78, 71, 0, 0),
+            byteArrayOf(76, 65, 79, 0, 0, 0),
+            byteArrayOf(76, 69, 0, 0, 0, 0),
+            byteArrayOf(76, 69, 73, 0, 0, 0),
+            byteArrayOf(76, 69, 78, 71, 0, 0),
+            byteArrayOf(76, 73, 0, 0, 0, 0),
+            byteArrayOf(76, 73, 65, 0, 0, 0),
+            byteArrayOf(76, 73, 65, 78, 0, 0),
+            byteArrayOf(76, 73, 65, 78, 71, 0),
+            byteArrayOf(76, 73, 65, 79, 0, 0),
+            byteArrayOf(76, 73, 69, 0, 0, 0),
+            byteArrayOf(76, 73, 78, 0, 0, 0),
+            byteArrayOf(76, 73, 78, 71, 0, 0),
+            byteArrayOf(76, 73, 85, 0, 0, 0),
+            byteArrayOf(76, 79, 0, 0, 0, 0),
+            byteArrayOf(76, 79, 78, 71, 0, 0),
+            byteArrayOf(76, 79, 85, 0, 0, 0),
+            byteArrayOf(76, 85, 0, 0, 0, 0),
+            byteArrayOf(76, 85, 65, 78, 0, 0),
+            byteArrayOf(76, 85, 69, 0, 0, 0),
+            byteArrayOf(76, 85, 78, 0, 0, 0),
+            byteArrayOf(76, 85, 79, 0, 0, 0),
+            byteArrayOf(77, 0, 0, 0, 0, 0),
+            byteArrayOf(77, 65, 0, 0, 0, 0),
+            byteArrayOf(77, 65, 73, 0, 0, 0),
+            byteArrayOf(77, 65, 78, 0, 0, 0),
+            byteArrayOf(77, 65, 78, 71, 0, 0),
+            byteArrayOf(77, 65, 79, 0, 0, 0),
+            byteArrayOf(77, 69, 0, 0, 0, 0),
+            byteArrayOf(77, 69, 73, 0, 0, 0),
+            byteArrayOf(77, 69, 78, 0, 0, 0),
+            byteArrayOf(77, 69, 78, 71, 0, 0),
+            byteArrayOf(77, 73, 0, 0, 0, 0),
+            byteArrayOf(77, 73, 65, 78, 0, 0),
+            byteArrayOf(77, 73, 65, 79, 0, 0),
+            byteArrayOf(77, 73, 69, 0, 0, 0),
+            byteArrayOf(77, 73, 78, 0, 0, 0),
+            byteArrayOf(77, 73, 78, 71, 0, 0),
+            byteArrayOf(77, 73, 85, 0, 0, 0),
+            byteArrayOf(77, 79, 0, 0, 0, 0),
+            byteArrayOf(77, 79, 85, 0, 0, 0),
+            byteArrayOf(77, 85, 0, 0, 0, 0),
+            byteArrayOf(78, 0, 0, 0, 0, 0),
+            byteArrayOf(78, 65, 0, 0, 0, 0),
+            byteArrayOf(78, 65, 73, 0, 0, 0),
+            byteArrayOf(78, 65, 78, 0, 0, 0),
+            byteArrayOf(78, 65, 78, 71, 0, 0),
+            byteArrayOf(78, 65, 79, 0, 0, 0),
+            byteArrayOf(78, 69, 0, 0, 0, 0),
+            byteArrayOf(78, 69, 73, 0, 0, 0),
+            byteArrayOf(78, 69, 78, 0, 0, 0),
+            byteArrayOf(78, 69, 78, 71, 0, 0),
+            byteArrayOf(78, 73, 0, 0, 0, 0),
+            byteArrayOf(78, 73, 65, 78, 0, 0),
+            byteArrayOf(78, 73, 65, 78, 71, 0),
+            byteArrayOf(78, 73, 65, 79, 0, 0),
+            byteArrayOf(78, 73, 69, 0, 0, 0),
+            byteArrayOf(78, 73, 78, 0, 0, 0),
+            byteArrayOf(78, 73, 78, 71, 0, 0),
+            byteArrayOf(78, 73, 85, 0, 0, 0),
+            byteArrayOf(78, 79, 78, 71, 0, 0),
+            byteArrayOf(78, 79, 85, 0, 0, 0),
+            byteArrayOf(78, 85, 0, 0, 0, 0),
+            byteArrayOf(78, 85, 65, 78, 0, 0),
+            byteArrayOf(78, 85, 69, 0, 0, 0),
+            byteArrayOf(78, 85, 78, 0, 0, 0),
+            byteArrayOf(78, 85, 79, 0, 0, 0),
+            byteArrayOf(79, 0, 0, 0, 0, 0),
+            byteArrayOf(79, 85, 0, 0, 0, 0),
+            byteArrayOf(80, 65, 0, 0, 0, 0),
+            byteArrayOf(80, 65, 73, 0, 0, 0),
+            byteArrayOf(80, 65, 78, 0, 0, 0),
+            byteArrayOf(80, 65, 78, 71, 0, 0),
+            byteArrayOf(80, 65, 79, 0, 0, 0),
+            byteArrayOf(80, 69, 73, 0, 0, 0),
+            byteArrayOf(80, 69, 78, 0, 0, 0),
+            byteArrayOf(80, 69, 78, 71, 0, 0),
+            byteArrayOf(80, 73, 0, 0, 0, 0),
+            byteArrayOf(80, 73, 65, 78, 0, 0),
+            byteArrayOf(80, 73, 65, 79, 0, 0),
+            byteArrayOf(80, 73, 69, 0, 0, 0),
+            byteArrayOf(80, 73, 78, 0, 0, 0),
+            byteArrayOf(80, 73, 78, 71, 0, 0),
+            byteArrayOf(80, 79, 0, 0, 0, 0),
+            byteArrayOf(80, 79, 85, 0, 0, 0),
+            byteArrayOf(80, 85, 0, 0, 0, 0),
+            byteArrayOf(81, 73, 0, 0, 0, 0),
+            byteArrayOf(81, 73, 65, 0, 0, 0),
+            byteArrayOf(81, 73, 65, 78, 0, 0),
+            byteArrayOf(81, 73, 65, 78, 71, 0),
+            byteArrayOf(81, 73, 65, 79, 0, 0),
+            byteArrayOf(81, 73, 69, 0, 0, 0),
+            byteArrayOf(81, 73, 78, 0, 0, 0),
+            byteArrayOf(81, 73, 78, 71, 0, 0),
+            byteArrayOf(81, 73, 79, 78, 71, 0),
+            byteArrayOf(81, 73, 85, 0, 0, 0),
+            byteArrayOf(81, 85, 0, 0, 0, 0),
+            byteArrayOf(81, 85, 65, 78, 0, 0),
+            byteArrayOf(81, 85, 69, 0, 0, 0),
+            byteArrayOf(81, 85, 78, 0, 0, 0),
+            byteArrayOf(82, 65, 78, 0, 0, 0),
+            byteArrayOf(82, 65, 78, 71, 0, 0),
+            byteArrayOf(82, 65, 79, 0, 0, 0),
+            byteArrayOf(82, 69, 0, 0, 0, 0),
+            byteArrayOf(82, 69, 78, 0, 0, 0),
+            byteArrayOf(82, 69, 78, 71, 0, 0),
+            byteArrayOf(82, 73, 0, 0, 0, 0),
+            byteArrayOf(82, 79, 78, 71, 0, 0),
+            byteArrayOf(82, 79, 85, 0, 0, 0),
+            byteArrayOf(82, 85, 0, 0, 0, 0),
+            byteArrayOf(82, 85, 65, 0, 0, 0),
+            byteArrayOf(82, 85, 65, 78, 0, 0),
+            byteArrayOf(82, 85, 73, 0, 0, 0),
+            byteArrayOf(82, 85, 78, 0, 0, 0),
+            byteArrayOf(82, 85, 79, 0, 0, 0),
+            byteArrayOf(83, 65, 0, 0, 0, 0),
+            byteArrayOf(83, 65, 73, 0, 0, 0),
+            byteArrayOf(83, 65, 78, 0, 0, 0),
+            byteArrayOf(83, 65, 78, 71, 0, 0),
+            byteArrayOf(83, 65, 79, 0, 0, 0),
+            byteArrayOf(83, 69, 0, 0, 0, 0),
+            byteArrayOf(83, 69, 78, 0, 0, 0),
+            byteArrayOf(83, 69, 78, 71, 0, 0),
+            byteArrayOf(83, 72, 65, 0, 0, 0),
+            byteArrayOf(83, 72, 65, 73, 0, 0),
+            byteArrayOf(83, 72, 65, 78, 0, 0),
+            byteArrayOf(83, 72, 65, 78, 71, 0),
+            byteArrayOf(83, 72, 65, 79, 0, 0),
+            byteArrayOf(83, 72, 69, 0, 0, 0),
+            byteArrayOf(83, 72, 69, 78, 0, 0),
+            byteArrayOf(88, 73, 78, 0, 0, 0),
+            byteArrayOf(83, 72, 69, 78, 0, 0),
+            byteArrayOf(83, 72, 69, 78, 71, 0),
+            byteArrayOf(83, 72, 73, 0, 0, 0),
+            byteArrayOf(83, 72, 79, 85, 0, 0),
+            byteArrayOf(83, 72, 85, 0, 0, 0),
+            byteArrayOf(83, 72, 85, 65, 0, 0),
+            byteArrayOf(83, 72, 85, 65, 73, 0),
+            byteArrayOf(83, 72, 85, 65, 78, 0),
+            byteArrayOf(83, 72, 85, 65, 78, 71),
+            byteArrayOf(83, 72, 85, 73, 0, 0),
+            byteArrayOf(83, 72, 85, 78, 0, 0),
+            byteArrayOf(83, 72, 85, 79, 0, 0),
+            byteArrayOf(83, 73, 0, 0, 0, 0),
+            byteArrayOf(83, 79, 78, 71, 0, 0),
+            byteArrayOf(83, 79, 85, 0, 0, 0),
+            byteArrayOf(83, 85, 0, 0, 0, 0),
+            byteArrayOf(83, 85, 65, 78, 0, 0),
+            byteArrayOf(83, 85, 73, 0, 0, 0),
+            byteArrayOf(83, 85, 78, 0, 0, 0),
+            byteArrayOf(83, 85, 79, 0, 0, 0),
+            byteArrayOf(84, 65, 0, 0, 0, 0),
+            byteArrayOf(84, 65, 73, 0, 0, 0),
+            byteArrayOf(84, 65, 78, 0, 0, 0),
+            byteArrayOf(84, 65, 78, 71, 0, 0),
+            byteArrayOf(84, 65, 79, 0, 0, 0),
+            byteArrayOf(84, 69, 0, 0, 0, 0),
+            byteArrayOf(84, 69, 78, 71, 0, 0),
+            byteArrayOf(84, 73, 0, 0, 0, 0),
+            byteArrayOf(84, 73, 65, 78, 0, 0),
+            byteArrayOf(84, 73, 65, 79, 0, 0),
+            byteArrayOf(84, 73, 69, 0, 0, 0),
+            byteArrayOf(84, 73, 78, 71, 0, 0),
+            byteArrayOf(84, 79, 78, 71, 0, 0),
+            byteArrayOf(84, 79, 85, 0, 0, 0),
+            byteArrayOf(84, 85, 0, 0, 0, 0),
+            byteArrayOf(84, 85, 65, 78, 0, 0),
+            byteArrayOf(84, 85, 73, 0, 0, 0),
+            byteArrayOf(84, 85, 78, 0, 0, 0),
+            byteArrayOf(84, 85, 79, 0, 0, 0),
+            byteArrayOf(87, 65, 0, 0, 0, 0),
+            byteArrayOf(87, 65, 73, 0, 0, 0),
+            byteArrayOf(87, 65, 78, 0, 0, 0),
+            byteArrayOf(87, 65, 78, 71, 0, 0),
+            byteArrayOf(87, 69, 73, 0, 0, 0),
+            byteArrayOf(87, 69, 78, 0, 0, 0),
+            byteArrayOf(87, 69, 78, 71, 0, 0),
+            byteArrayOf(87, 79, 0, 0, 0, 0),
+            byteArrayOf(87, 85, 0, 0, 0, 0),
+            byteArrayOf(88, 73, 0, 0, 0, 0),
+            byteArrayOf(88, 73, 65, 0, 0, 0),
+            byteArrayOf(88, 73, 65, 78, 0, 0),
+            byteArrayOf(88, 73, 65, 78, 71, 0),
+            byteArrayOf(88, 73, 65, 79, 0, 0),
+            byteArrayOf(88, 73, 69, 0, 0, 0),
+            byteArrayOf(88, 73, 78, 0, 0, 0),
+            byteArrayOf(88, 73, 78, 71, 0, 0),
+            byteArrayOf(88, 73, 79, 78, 71, 0),
+            byteArrayOf(88, 73, 85, 0, 0, 0),
+            byteArrayOf(88, 85, 0, 0, 0, 0),
+            byteArrayOf(88, 85, 65, 78, 0, 0),
+            byteArrayOf(88, 85, 69, 0, 0, 0),
+            byteArrayOf(88, 85, 78, 0, 0, 0),
+            byteArrayOf(89, 65, 0, 0, 0, 0),
+            byteArrayOf(89, 65, 78, 0, 0, 0),
+            byteArrayOf(89, 65, 78, 71, 0, 0),
+            byteArrayOf(89, 65, 79, 0, 0, 0),
+            byteArrayOf(89, 69, 0, 0, 0, 0),
+            byteArrayOf(89, 73, 0, 0, 0, 0),
+            byteArrayOf(89, 73, 78, 0, 0, 0),
+            byteArrayOf(89, 73, 78, 71, 0, 0),
+            byteArrayOf(89, 79, 0, 0, 0, 0),
+            byteArrayOf(89, 79, 78, 71, 0, 0),
+            byteArrayOf(89, 79, 85, 0, 0, 0),
+            byteArrayOf(89, 85, 0, 0, 0, 0),
+            byteArrayOf(89, 85, 65, 78, 0, 0),
+            byteArrayOf(89, 85, 69, 0, 0, 0),
+            byteArrayOf(89, 85, 78, 0, 0, 0),
+            byteArrayOf(74, 85, 78, 0, 0, 0),
+            byteArrayOf(89, 85, 78, 0, 0, 0),
+            byteArrayOf(90, 65, 0, 0, 0, 0),
+            byteArrayOf(90, 65, 73, 0, 0, 0),
+            byteArrayOf(90, 65, 78, 0, 0, 0),
+            byteArrayOf(90, 65, 78, 71, 0, 0),
+            byteArrayOf(90, 65, 79, 0, 0, 0),
+            byteArrayOf(90, 69, 0, 0, 0, 0),
+            byteArrayOf(90, 69, 73, 0, 0, 0),
+            byteArrayOf(90, 69, 78, 0, 0, 0),
+            byteArrayOf(90, 69, 78, 71, 0, 0),
+            byteArrayOf(90, 72, 65, 0, 0, 0),
+            byteArrayOf(90, 72, 65, 73, 0, 0),
+            byteArrayOf(90, 72, 65, 78, 0, 0),
+            byteArrayOf(90, 72, 65, 78, 71, 0),
+            byteArrayOf(67, 72, 65, 78, 71, 0),
+            byteArrayOf(90, 72, 65, 78, 71, 0),
+            byteArrayOf(90, 72, 65, 79, 0, 0),
+            byteArrayOf(90, 72, 69, 0, 0, 0),
+            byteArrayOf(90, 72, 69, 78, 0, 0),
+            byteArrayOf(90, 72, 69, 78, 71, 0),
+            byteArrayOf(90, 72, 73, 0, 0, 0),
+            byteArrayOf(83, 72, 73, 0, 0, 0),
+            byteArrayOf(90, 72, 73, 0, 0, 0),
+            byteArrayOf(90, 72, 79, 78, 71, 0),
+            byteArrayOf(90, 72, 79, 85, 0, 0),
+            byteArrayOf(90, 72, 85, 0, 0, 0),
+            byteArrayOf(90, 72, 85, 65, 0, 0),
+            byteArrayOf(90, 72, 85, 65, 73, 0),
+            byteArrayOf(90, 72, 85, 65, 78, 0),
+            byteArrayOf(90, 72, 85, 65, 78, 71),
+            byteArrayOf(90, 72, 85, 73, 0, 0),
+            byteArrayOf(90, 72, 85, 78, 0, 0),
+            byteArrayOf(90, 72, 85, 79, 0, 0),
+            byteArrayOf(90, 73, 0, 0, 0, 0),
+            byteArrayOf(90, 79, 78, 71, 0, 0),
+            byteArrayOf(90, 79, 85, 0, 0, 0),
+            byteArrayOf(90, 85, 0, 0, 0, 0),
+            byteArrayOf(90, 85, 65, 78, 0, 0),
+            byteArrayOf(90, 85, 73, 0, 0, 0),
+            byteArrayOf(90, 85, 78, 0, 0, 0),
+            byteArrayOf(90, 85, 79, 0, 0, 0),
+            byteArrayOf(0, 0, 0, 0, 0, 0),
+            byteArrayOf(83, 72, 65, 78, 0, 0),
+            byteArrayOf(0, 0, 0, 0, 0, 0)
+        )
+
         /**
-         * Original string before translation.
+         * First and last Chinese character with known Pinyin according to zh
+         * collation
          */
-        public String source;
-        /**
-         * Translated string of source. For Han, target is corresponding Pinyin.
-         * Otherwise target is original string in source.
-         */
-        public String target;
-    }
+        private const val FIRST_PINYIN_UNIHAN = "\u963F"
+        private const val LAST_PINYIN_UNIHAN = "\u9FFF"
+        private val COLLATOR = Collator.getInstance(Locale.CHINA)
+        private var sInstance: HanZiToPinyin? = null// Do self validation just once.
 
-    private HanZiToPinyin(boolean hasChinaCollator) {
-        mHasChinaCollator = hasChinaCollator;
-    }
-
-    public static HanZiToPinyin getInstance() {
-        synchronized (HanZiToPinyin.class) {
-            if (sInstance != null) {
-                return sInstance;
-            }
-            // Check if zh_CN collation data is available
-            final Locale locale[] = Collator.getAvailableLocales();
-
-            // 增加的代码，增强。
-            final Locale chinaAddition = new Locale("zh");
-
-            for (Locale aLocale : locale) {
-                if (aLocale.equals(Locale.CHINA)
-                        || aLocale.equals(chinaAddition)) {
-                    // Do self validation just once.
-                    if (DEBUG) {
-                        Log.d(TAG, "Self validation. Result: "
-                                + doSelfValidation());
+        // Check if zh_CN collation data is available
+        val instance: HanZiToPinyin?
+            get() {
+                synchronized(HanZiToPinyin::class.java) {
+                    if (sInstance != null) {
+                        return sInstance
                     }
-                    sInstance = new HanZiToPinyin(true);
-                    return sInstance;
-                }
-            }
-            Log.w(TAG,
-                    "There is no Chinese collator, HanZiToPinyin is disabled");
-            sInstance = new HanZiToPinyin(false);
-            return sInstance;
-        }
-    }
+                    // Check if zh_CN collation data is available
+                    val locale = Collator.getAvailableLocales()
 
-    /**
-     * Validate if our internal table has some wrong value.
-     *
-     * @return true when the table looks correct.
-     */
-    private static boolean doSelfValidation() {
-        char lastChar = UNIHANS[0];
-        String lastString = Character.toString(lastChar);
-        for (char c : UNIHANS) {
-            if (lastChar == c) {
-                continue;
-            }
-            final String curString = Character.toString(c);
-            int cmp = COLLATOR.compare(lastString, curString);
-            if (cmp >= 0) {
-                Log.e(TAG, "Internal error in Unihan table. "
-                        + "The last string \"" + lastString
-                        + "\" is greater than current string \"" + curString
-                        + "\".");
-                return false;
-            }
-            lastString = curString;
-        }
-        return true;
-    }
-
-    private Token getToken(char character) {
-        Token token = new Token();
-        final String letter = Character.toString(character);
-        token.source = letter;
-        int offset = -1;
-        int cmp;
-        if (character < 256) {
-            token.type = Token.LATIN;
-            token.target = letter;
-            return token;
-        } else {
-            cmp = COLLATOR.compare(letter, FIRST_PINYIN_UNIHAN);
-            if (cmp < 0) {
-                token.type = Token.UNKNOWN;
-                token.target = letter;
-                return token;
-            } else if (cmp == 0) {
-                token.type = Token.PINYIN;
-                offset = 0;
-            } else {
-                cmp = COLLATOR.compare(letter, LAST_PINYIN_UNIHAN);
-                if (cmp > 0) {
-                    token.type = Token.UNKNOWN;
-                    token.target = letter;
-                    return token;
-                } else if (cmp == 0) {
-                    token.type = Token.PINYIN;
-                    offset = UNIHANS.length - 1;
-                }
-            }
-        }
-
-        token.type = Token.PINYIN;
-        if (offset < 0) {
-            int begin = 0;
-            int end = UNIHANS.length - 1;
-            while (begin <= end) {
-                offset = (begin + end) / 2;
-                final String unihan = Character.toString(UNIHANS[offset]);
-                cmp = COLLATOR.compare(letter, unihan);
-                if (cmp == 0) {
-                    break;
-                } else if (cmp > 0) {
-                    begin = offset + 1;
-                } else {
-                    end = offset - 1;
-                }
-            }
-        }
-        if (cmp < 0) {
-            offset--;
-        }
-        StringBuilder pinyin = new StringBuilder();
-        for (int j = 0; j < PINYINS[offset].length && PINYINS[offset][j] != 0; j++) {
-            pinyin.append((char) PINYINS[offset][j]);
-        }
-        token.target = pinyin.toString();
-        if (TextUtils.isEmpty(token.target)) {
-            token.type = Token.UNKNOWN;
-            token.target = token.source;
-        }
-        return token;
-    }
-
-    /**
-     * Convert the input to a array of tokens. The sequence of ASCII or Unknown
-     * characters without space will be put into a Token, One Hanzi character
-     * which has pinyin will be treated as a Token. If these is no China
-     * collator, the empty token array is returned.
-     */
-    public ArrayList<Token> get(final String input) {
-        ArrayList<Token> tokens = new ArrayList<>();
-        if (!mHasChinaCollator || TextUtils.isEmpty(input)) {
-            // return empty tokens.
-            return tokens;
-        }
-        final int inputLength = input.length();
-        final StringBuilder sb = new StringBuilder();
-        int tokenType = Token.LATIN;
-        // Go through the input, create a new token when
-        // a. Token type changed
-        // b. Get the Pinyin of current charater.
-        // c. current character is space.
-        for (int i = 0; i < inputLength; i++) {
-            final char character = input.charAt(i);
-            if (character == ' ') {
-                if (sb.length() > 0) {
-                    addToken(sb, tokens, tokenType);
-                }
-            } else if (character < 256) {
-                if (tokenType != Token.LATIN && sb.length() > 0) {
-                    addToken(sb, tokens, tokenType);
-                }
-                tokenType = Token.LATIN;
-                sb.append(character);
-            } else {
-                Token t = getToken(character);
-                if (t.type == Token.PINYIN) {
-                    if (sb.length() > 0) {
-                        addToken(sb, tokens, tokenType);
+                    // 增加的代码，增强。
+                    val chinaAddition = Locale("zh")
+                    for (aLocale in locale) {
+                        if (aLocale == Locale.CHINA || aLocale == chinaAddition) {
+                            // Do self validation just once.
+                            if (DEBUG) {
+                                Log.d(
+                                    TAG, "Self validation. Result: "
+                                            + doSelfValidation()
+                                )
+                            }
+                            sInstance = HanZiToPinyin(true)
+                            return sInstance
+                        }
                     }
-                    tokens.add(t);
-                    tokenType = Token.PINYIN;
-                } else {
-                    if (tokenType != t.type && sb.length() > 0) {
-                        addToken(sb, tokens, tokenType);
-                    }
-                    tokenType = t.type;
-                    sb.append(character);
+                    Log.w(
+                        TAG,
+                        "There is no Chinese collator, HanZiToPinyin is disabled"
+                    )
+                    sInstance = HanZiToPinyin(false)
+                    return sInstance
                 }
             }
-        }
-        if (sb.length() > 0) {
-            addToken(sb, tokens, tokenType);
-        }
-        return tokens;
-    }
 
-    private void addToken(final StringBuilder sb,
-                          final ArrayList<Token> tokens, final int tokenType) {
-        String str = sb.toString();
-        tokens.add(new Token(tokenType, str, str));
-        sb.setLength(0);
+        /**
+         * Validate if our internal table has some wrong value.
+         *
+         * @return true when the table looks correct.
+         */
+        private fun doSelfValidation(): Boolean {
+            val lastChar = UNIHANS[0]
+            var lastString = Character.toString(lastChar)
+            for (c in UNIHANS) {
+                if (lastChar == c) {
+                    continue
+                }
+                val curString = Character.toString(c)
+                val cmp = COLLATOR.compare(lastString, curString)
+                if (cmp >= 0) {
+                    Log.e(
+                        TAG, "Internal error in Unihan table. "
+                                + "The last string \"" + lastString
+                                + "\" is greater than current string \"" + curString
+                                + "\"."
+                    )
+                    return false
+                }
+                lastString = curString
+            }
+            return true
+        }
     }
 }

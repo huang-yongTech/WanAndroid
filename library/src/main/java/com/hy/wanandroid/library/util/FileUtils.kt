@@ -1,35 +1,31 @@
-package com.hy.wanandroid.library.util;
+package com.hy.wanandroid.library.util
 
-import java.io.File;
-import java.io.IOException;
+import java.io.File
+import java.io.IOException
 
 /**
  * Created by huangyong on 2018/3/14.
  * 文件操作相关工具类
  */
-
-public final class FileUtils {
-    private FileUtils() {
-    }
-
+object FileUtils {
     /**
      * 判断文件是否存在
      *
      * @param filePath 文件路径
-     * @return {@code true}: 存在<br>{@code false}: 不存在
+     * @return `true`: 存在<br></br>`false`: 不存在
      */
-    public static boolean isFileExists(final String filePath) {
-        return isFileExists(getFileByPath(filePath));
+    fun isFileExists(filePath: String?): Boolean {
+        return isFileExists(getFileByPath(filePath))
     }
 
     /**
      * 判断文件是否存在
      *
      * @param file 文件
-     * @return {@code true}: 存在<br>{@code false}: 不存在
+     * @return `true`: 存在<br></br>`false`: 不存在
      */
-    public static boolean isFileExists(final File file) {
-        return file != null && file.exists();
+    fun isFileExists(file: File?): Boolean {
+        return file != null && file.exists()
     }
 
     /**
@@ -38,55 +34,54 @@ public final class FileUtils {
      * @param filePath 文件路径
      * @return 文件
      */
-    public static File getFileByPath(final String filePath) {
-        return isSpace(filePath) ? null : new File(filePath);
+    fun getFileByPath(filePath: String?): File? {
+        return if (isSpace(filePath)) null else File(filePath)
     }
 
     /**
      * Create a directory if it doesn't exist, otherwise do nothing.
      *
      * @param dirPath The path of directory.
-     * @return {@code true}: exists or creates successfully<br>{@code false}: otherwise
+     * @return `true`: exists or creates successfully<br></br>`false`: otherwise
      */
-    public static boolean createOrExistsDir(final String dirPath) {
-        return createOrExistsDir(getFileByPath(dirPath));
+    fun createOrExistsDir(dirPath: String?): Boolean {
+        return createOrExistsDir(getFileByPath(dirPath))
     }
 
     /**
      * Create a directory if it doesn't exist, otherwise do nothing.
      *
      * @param file The file.
-     * @return {@code true}: exists or creates successfully<br>{@code false}: otherwise
+     * @return `true`: exists or creates successfully<br></br>`false`: otherwise
      */
-    public static boolean createOrExistsDir(final File file) {
-        return file != null && (file.exists() ? file.isDirectory() : file.mkdirs());
+    fun createOrExistsDir(file: File?): Boolean {
+        return file != null && if (file.exists()) file.isDirectory else file.mkdirs()
     }
 
     /**
      * Create a file if it doesn't exist, otherwise do nothing.
      *
      * @param filePath The path of file.
-     * @return {@code true}: exists or creates successfully<br>{@code false}: otherwise
+     * @return `true`: exists or creates successfully<br></br>`false`: otherwise
      */
-    public static boolean createOrExistsFile(final String filePath) {
-        return createOrExistsFile(getFileByPath(filePath));
+    fun createOrExistsFile(filePath: String?): Boolean {
+        return createOrExistsFile(getFileByPath(filePath))
     }
 
     /**
      * Create a file if it doesn't exist, otherwise do nothing.
      *
      * @param file The file.
-     * @return {@code true}: exists or creates successfully<br>{@code false}: otherwise
+     * @return `true`: exists or creates successfully<br></br>`false`: otherwise
      */
-    public static boolean createOrExistsFile(final File file) {
-        if (file == null) return false;
-        if (file.exists()) return file.isFile();
-        if (!createOrExistsDir(file.getParentFile())) return false;
-        try {
-            return file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    fun createOrExistsFile(file: File?): Boolean {
+        if (file == null) return false
+        if (file.exists()) return file.isFile
+        return if (!createOrExistsDir(file.parentFile)) false else try {
+            file.createNewFile()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            false
         }
     }
 
@@ -94,19 +89,22 @@ public final class FileUtils {
      * 删除文件
      *
      * @param file 待删除文件
-     * @return {@code true}: success<br>{@code false}: fail
+     * @return `true`: success<br></br>`false`: fail
      */
-    public static boolean deleteFile(final File file) {
-        return file != null && (!file.exists() || file.isFile() && file.delete());
+    fun deleteFile(file: File?): Boolean {
+        return file != null && (!file.exists() || file.isFile && file.delete())
     }
 
-    private static boolean isSpace(final String s) {
-        if (s == null) return true;
-        for (int i = 0, len = s.length(); i < len; ++i) {
-            if (!Character.isWhitespace(s.charAt(i))) {
-                return false;
+    private fun isSpace(s: String?): Boolean {
+        if (s == null) return true
+        var i = 0
+        val len = s.length
+        while (i < len) {
+            if (!Character.isWhitespace(s[i])) {
+                return false
             }
+            ++i
         }
-        return true;
+        return true
     }
 }

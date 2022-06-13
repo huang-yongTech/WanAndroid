@@ -1,36 +1,18 @@
-package com.hy.wanandroid.library.util;
+package com.hy.wanandroid.library.util
 
-import android.text.TextUtils;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import android.text.TextUtils
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by huangyong on 2017/12/25.
  * 日期转换工具类
  */
-
-public final class TimeUtils {
-    private TimeUtils() {
-    }
-
-    private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-    public static final DateFormat FORMAT_WITH_NO_SECONDS = new SimpleDateFormat("yy年MM月dd日 HH:mm", Locale.CHINA);
-
-    /**
-     * 将Date类型转换为时间字符串
-     *
-     * @param date 类型时间
-     * @return 时间字符串
-     */
-    public static String date2String(Date date) {
-        return date2String(date, DEFAULT_FORMAT);
-    }
-
+object TimeUtils {
+    private val DEFAULT_FORMAT: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
+    val FORMAT_WITH_NO_SECONDS: DateFormat = SimpleDateFormat("yy年MM月dd日 HH:mm", Locale.CHINA)
     /**
      * 将Date类型转换为时间字符串
      *
@@ -38,8 +20,15 @@ public final class TimeUtils {
      * @param format 时间格式
      * @return 时间字符串
      */
-    public static String date2String(Date date, DateFormat format) {
-        return format.format(date);
+    /**
+     * 将Date类型转换为时间字符串
+     *
+     * @param date 类型时间
+     * @return 时间字符串
+     */
+    @JvmOverloads
+    fun date2String(date: Date?, format: DateFormat = DEFAULT_FORMAT): String {
+        return format.format(date)
     }
 
     /**
@@ -48,8 +37,8 @@ public final class TimeUtils {
      * @param date date类型时间
      * @return 时间戳
      */
-    public static long date2Millis(final Date date) {
-        return date.getTime();
+    fun date2Millis(date: Date): Long {
+        return date.time
     }
 
     /**
@@ -58,58 +47,53 @@ public final class TimeUtils {
      * @param millis 时间戳类型时间
      * @return date类型时间
      */
-    public static Date millis2Date(final long millis) {
-        return new Date(millis);
-    }
-
-    public static String millis2String(long millis) {
-        return millis2String(millis, DEFAULT_FORMAT);
+    fun millis2Date(millis: Long): Date {
+        return Date(millis)
     }
 
     /**
      * 将时间戳转为时间字符串
-     * <p>格式为 format</p>
+     *
+     * 格式为 format
      *
      * @param millis 毫秒时间戳
      * @param format 时间格式
      * @return 时间字符串
      */
-    public static String millis2String(long millis, DateFormat format) {
-        if (millis == 0) {
-            return "";
-        }
-        return format.format(new Date(millis));
+    @JvmOverloads
+    fun millis2String(millis: Long, format: DateFormat = DEFAULT_FORMAT): String {
+        return if (millis == 0L) {
+            ""
+        } else format.format(Date(millis))
     }
-
     /**
      * 将时间字符串转为时间戳
-     * <p>time 格式为 yyyy-MM-dd HH:mm:ss</p>
      *
-     * @param time 时间字符串
-     * @return 毫秒时间戳
-     */
-    public static long string2Millis(String time) {
-        return string2Millis(time, DEFAULT_FORMAT);
-    }
-
-    /**
-     * 将时间字符串转为时间戳
-     * <p>time 格式为 format</p>
+     * time 格式为 format
      *
      * @param time   时间字符串
      * @param format 时间格式
      * @return 毫秒时间戳
      */
-    public static long string2Millis(String time, DateFormat format) {
+    /**
+     * 将时间字符串转为时间戳
+     *
+     * time 格式为 yyyy-MM-dd HH:mm:ss
+     *
+     * @param time 时间字符串
+     * @return 毫秒时间戳
+     */
+    @JvmOverloads
+    fun string2Millis(time: String?, format: DateFormat = DEFAULT_FORMAT): Long {
         if (TextUtils.isEmpty(time)) {
-            return 0;
+            return 0
         }
         try {
-            return format.parse(time).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            return format.parse(time.toString())?.time ?: 0
+        } catch (e: ParseException) {
+            e.printStackTrace()
         }
-        return 0;
+        return 0
     }
 
     /**
@@ -118,17 +102,17 @@ public final class TimeUtils {
      * @param time 时间字符串
      * @return 布尔返回值
      */
-    public static boolean isValidDate(String time) {
-        boolean convertSuccess = true;
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    fun isValidDate(time: String?): Boolean {
+        var convertSuccess = true
+        val format: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         try {
-            format.setLenient(false);
-            format.parse(time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            convertSuccess = false;
+            format.isLenient = false
+            format.parse(time.toString())
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            convertSuccess = false
         }
-        return convertSuccess;
+        return convertSuccess
     }
 
     /**
@@ -138,31 +122,29 @@ public final class TimeUtils {
      * @param endTime   终止日期
      * @return 相差天数
      */
-    public static int calculateIntervalDay(long beginTime, long endTime) {
-        Calendar beginCal = Calendar.getInstance();
-        Calendar endCal = Calendar.getInstance();
-        beginCal.setTimeInMillis(beginTime);
-        endCal.setTimeInMillis(endTime);
-
-        int beginYear = beginCal.get(Calendar.YEAR);
-        int endYear = endCal.get(Calendar.YEAR);
-        int beginDayOfYear = beginCal.get(Calendar.DAY_OF_YEAR);
-        int endDayOfYear = endCal.get(Calendar.DAY_OF_YEAR);
-
-        if (beginYear == endYear) {
-            return endDayOfYear - beginDayOfYear;
+    fun calculateIntervalDay(beginTime: Long, endTime: Long): Int {
+        val beginCal = Calendar.getInstance()
+        val endCal = Calendar.getInstance()
+        beginCal.timeInMillis = beginTime
+        endCal.timeInMillis = endTime
+        val beginYear = beginCal[Calendar.YEAR]
+        val endYear = endCal[Calendar.YEAR]
+        val beginDayOfYear = beginCal[Calendar.DAY_OF_YEAR]
+        val endDayOfYear = endCal[Calendar.DAY_OF_YEAR]
+        return if (beginYear == endYear) {
+            endDayOfYear - beginDayOfYear
         } else {
-            int timeDistance = 0;
-            for (int i = beginYear; i < endYear; i++) {
-                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0) {
+            var timeDistance = 0
+            for (i in beginYear until endYear) {
+                timeDistance += if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0) {
                     //闰年
-                    timeDistance += 366;
+                    366
                 } else {
                     //不是闰年
-                    timeDistance += 365;
+                    365
                 }
             }
-            return timeDistance + (endDayOfYear - beginDayOfYear);
+            timeDistance + (endDayOfYear - beginDayOfYear)
         }
     }
 
@@ -172,8 +154,8 @@ public final class TimeUtils {
      * @param time 时间戳
      * @return 年份
      */
-    public static int getYear(long time) {
-        return getCalendar(time).get(Calendar.YEAR);
+    fun getYear(time: Long): Int {
+        return getCalendar(time)[Calendar.YEAR]
     }
 
     /**
@@ -182,8 +164,8 @@ public final class TimeUtils {
      * @param time 时间戳
      * @return 月份
      */
-    public static int getMonth(long time) {
-        return getCalendar(time).get(Calendar.MONTH) + 1;
+    fun getMonth(time: Long): Int {
+        return getCalendar(time)[Calendar.MONTH] + 1
     }
 
     /**
@@ -192,8 +174,8 @@ public final class TimeUtils {
      * @param time 时间戳
      * @return 月份中的天
      */
-    public static int getDayOfMonth(long time) {
-        return getCalendar(time).get(Calendar.DAY_OF_MONTH);
+    fun getDayOfMonth(time: Long): Int {
+        return getCalendar(time)[Calendar.DAY_OF_MONTH]
     }
 
     /**
@@ -201,10 +183,10 @@ public final class TimeUtils {
      *
      * @return 年份
      */
-    public static int addDayAndGetYear(long time, int days) {
-        Calendar calendar = getCalendar(time);
-        calendar.add(Calendar.DAY_OF_YEAR, days);
-        return calendar.get(Calendar.YEAR);
+    fun addDayAndGetYear(time: Long, days: Int): Int {
+        val calendar = getCalendar(time)
+        calendar.add(Calendar.DAY_OF_YEAR, days)
+        return calendar[Calendar.YEAR]
     }
 
     /**
@@ -212,10 +194,10 @@ public final class TimeUtils {
      *
      * @return 月份
      */
-    public static int addDayAndGetMonth(long time, int days) {
-        Calendar calendar = getCalendar(time);
-        calendar.add(Calendar.DAY_OF_YEAR, days);
-        return calendar.get(Calendar.MONTH) + 1;
+    fun addDayAndGetMonth(time: Long, days: Int): Int {
+        val calendar = getCalendar(time)
+        calendar.add(Calendar.DAY_OF_YEAR, days)
+        return calendar[Calendar.MONTH] + 1
     }
 
     /**
@@ -223,10 +205,10 @@ public final class TimeUtils {
      *
      * @return 增加日期后的天
      */
-    public static int addDayAndGetDayOfMonth(long time, int days) {
-        Calendar calendar = getCalendar(time);
-        calendar.add(Calendar.DAY_OF_YEAR, days);
-        return calendar.get(Calendar.DAY_OF_MONTH);
+    fun addDayAndGetDayOfMonth(time: Long, days: Int): Int {
+        val calendar = getCalendar(time)
+        calendar.add(Calendar.DAY_OF_YEAR, days)
+        return calendar[Calendar.DAY_OF_MONTH]
     }
 
     /**
@@ -235,9 +217,9 @@ public final class TimeUtils {
      * @param time 时间
      * @return calendar
      */
-    private static Calendar getCalendar(long time) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time);
-        return calendar;
+    private fun getCalendar(time: Long): Calendar {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = time
+        return calendar
     }
 }

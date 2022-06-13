@@ -44,7 +44,7 @@ class SearchResultFragment : BaseFragment() {
         mBinding?.vm = mViewModel
         mBinding?.searchResultInclude?.clickProxy = PublicClickProxy()
         mBinding?.searchResultInclude?.title = mSearchKey
-        BarUtils.setAppToolBarMarginTop(context, mBinding?.searchResultInclude?.publicToolbar)
+        BarUtils.setAppToolBarMarginTop(requireContext(), mBinding?.searchResultInclude?.publicToolbar)
         initRefreshLayout()
         initRecyclerView()
         return view

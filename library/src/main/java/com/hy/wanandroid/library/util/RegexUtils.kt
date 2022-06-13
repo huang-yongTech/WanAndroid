@@ -1,17 +1,12 @@
-package com.hy.wanandroid.library.util;
+package com.hy.wanandroid.library.util
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.Pattern
 
 /**
  * Created by huangyong on 2018/3/21.
  * 正则匹配工具类
  */
-
-public final class RegexUtils {
-    private RegexUtils() {
-    }
-
+object RegexUtils {
     /**
      * 查找某个html字符串中是否包含img标签
      *
@@ -19,8 +14,8 @@ public final class RegexUtils {
      * @param regex 匹配规则
      * @return 结果
      */
-    public static boolean findTagImg(String html, String regex) {
-        Matcher matcher = Pattern.compile(regex).matcher(html);
-        return matcher.find();
+    fun findTagImg(html: String?, regex: String?): Boolean {
+        val matcher = Pattern.compile(regex.toString()).matcher(html.toString())
+        return matcher.find()
     }
 }

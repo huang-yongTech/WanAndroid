@@ -44,7 +44,7 @@ class SearchFragment : BaseFragment() {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         mBinding = FragmentSearchBinding.bind(view)
         mBinding?.vm = mSearchViewModel
-        BarUtils.setAppToolBarMarginTop(context, mBinding!!.searchToolbar)
+        BarUtils.setAppToolBarMarginTop(requireContext(), mBinding?.searchToolbar)
         initView()
         initAdapter()
         return view

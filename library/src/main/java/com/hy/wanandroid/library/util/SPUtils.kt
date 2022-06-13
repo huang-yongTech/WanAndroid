@@ -1,59 +1,22 @@
-package com.hy.wanandroid.library.util;
+package com.hy.wanandroid.library.util
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import androidx.collection.SimpleArrayMap;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
-import io.reactivex.annotations.NonNull;
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.collection.SimpleArrayMap
 
 /**
  * Created by huangyong on 2018/5/3
  * SharedPreferences工具类
  */
-public class SPUtils {
+class SPUtils {
+    private var sp: SharedPreferences
 
-    private static SimpleArrayMap<String, SPUtils> SP_UTILS_MAP = new SimpleArrayMap<>();
-    private SharedPreferences sp;
-
-    /**
-     * Return the single {@link SPUtils} instance
-     *
-     * @param spName The name of sp.
-     * @return the single {@link SPUtils} instance
-     */
-    public static SPUtils getInstance(Context context, String spName) {
-        return getInstance(context, spName, Context.MODE_PRIVATE);
+    private constructor(context: Context, spName: String) {
+        sp = context.getSharedPreferences(spName, Context.MODE_PRIVATE)
     }
 
-    /**
-     * Return the single {@link SPUtils} instance
-     *
-     * @param spName The name of sp.
-     * @param mode   Operating mode.
-     * @return the single {@link SPUtils} instance
-     */
-    public static SPUtils getInstance(Context context, String spName, final int mode) {
-        if (isSpace(spName))
-            spName = "spUtils";
-        SPUtils spUtils = SP_UTILS_MAP.get(spName);
-        if (spUtils == null) {
-            spUtils = new SPUtils(context, spName, mode);
-            SP_UTILS_MAP.put(spName, spUtils);
-        }
-        return spUtils;
-    }
-
-    private SPUtils(Context context, final String spName) {
-        sp = context.getSharedPreferences(spName, Context.MODE_PRIVATE);
-    }
-
-    private SPUtils(Context context, final String spName, final int mode) {
-        sp = context.getSharedPreferences(spName, mode);
+    private constructor(context: Context, spName: String, mode: Int) {
+        sp = context.getSharedPreferences(spName, mode)
     }
 
     /**
@@ -62,18 +25,18 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putString(@NonNull final String key, final String value) {
-        sp.edit().putString(key, value).apply();
+    fun putString(key: String, value: String?) {
+        sp.edit().putString(key, value).apply()
     }
 
     /**
      * Return the string value in sp.
      *
      * @param key The key of sp.
-     * @return the string value if sp exists or {@code ""} otherwise
+     * @return the string value if sp exists or `""` otherwise
      */
-    public String getString(@NonNull final String key) {
-        return getString(key, "");
+    fun getString(key: String): String? {
+        return getString(key, "")
     }
 
     /**
@@ -81,10 +44,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the string value if sp exists or {@code defaultValue} otherwise
+     * @return the string value if sp exists or `defaultValue` otherwise
      */
-    public String getString(@NonNull final String key, final String defaultValue) {
-        return sp.getString(key, defaultValue);
+    fun getString(key: String, defaultValue: String?): String? {
+        return sp.getString(key, defaultValue)
     }
 
     /**
@@ -93,18 +56,18 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putInt(@NonNull final String key, final int value) {
-        sp.edit().putInt(key, value).apply();
+    fun putInt(key: String, value: Int) {
+        sp.edit().putInt(key, value).apply()
     }
 
     /**
      * Return the int value in sp.
      *
      * @param key The key of sp.
-     * @return the int value if sp exists or {@code -1} otherwise
+     * @return the int value if sp exists or `-1` otherwise
      */
-    public int getInt(@NonNull final String key) {
-        return getInt(key, -1);
+    fun getInt(key: String): Int {
+        return getInt(key, -1)
     }
 
     /**
@@ -112,10 +75,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the int value if sp exists or {@code defaultValue} otherwise
+     * @return the int value if sp exists or `defaultValue` otherwise
      */
-    public int getInt(@NonNull final String key, final int defaultValue) {
-        return sp.getInt(key, defaultValue);
+    fun getInt(key: String, defaultValue: Int): Int {
+        return sp.getInt(key, defaultValue)
     }
 
     /**
@@ -124,18 +87,18 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putLong(@NonNull final String key, final long value) {
-        sp.edit().putLong(key, value).apply();
+    fun putLong(key: String, value: Long) {
+        sp.edit().putLong(key, value).apply()
     }
 
     /**
      * Return the long value in sp.
      *
      * @param key The key of sp.
-     * @return the long value if sp exists or {@code -1} otherwise
+     * @return the long value if sp exists or `-1` otherwise
      */
-    public long getLong(@NonNull final String key) {
-        return getLong(key, -1L);
+    fun getLong(key: String): Long {
+        return getLong(key, -1L)
     }
 
     /**
@@ -143,10 +106,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the long value if sp exists or {@code defaultValue} otherwise
+     * @return the long value if sp exists or `defaultValue` otherwise
      */
-    public long getLong(@NonNull final String key, final long defaultValue) {
-        return sp.getLong(key, defaultValue);
+    fun getLong(key: String, defaultValue: Long): Long {
+        return sp.getLong(key, defaultValue)
     }
 
     /**
@@ -155,18 +118,18 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putFloat(@NonNull final String key, final float value) {
-        sp.edit().putFloat(key, value).apply();
+    fun putFloat(key: String, value: Float) {
+        sp.edit().putFloat(key, value).apply()
     }
 
     /**
      * Return the float value in sp.
      *
      * @param key The key of sp.
-     * @return the float value if sp exists or {@code -1f} otherwise
+     * @return the float value if sp exists or `-1f` otherwise
      */
-    public float getFloat(@NonNull final String key) {
-        return getFloat(key, -1f);
+    fun getFloat(key: String): Float {
+        return getFloat(key, -1f)
     }
 
     /**
@@ -174,10 +137,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the float value if sp exists or {@code defaultValue} otherwise
+     * @return the float value if sp exists or `defaultValue` otherwise
      */
-    public float getFloat(@NonNull final String key, final float defaultValue) {
-        return sp.getFloat(key, defaultValue);
+    fun getFloat(key: String, defaultValue: Float): Float {
+        return sp.getFloat(key, defaultValue)
     }
 
     /**
@@ -186,18 +149,18 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putBoolean(@NonNull final String key, final boolean value) {
-        sp.edit().putBoolean(key, value).apply();
+    fun putBoolean(key: String, value: Boolean) {
+        sp.edit().putBoolean(key, value).apply()
     }
 
     /**
      * Return the boolean value in sp.
      *
      * @param key The key of sp.
-     * @return the boolean value if sp exists or {@code false} otherwise
+     * @return the boolean value if sp exists or `false` otherwise
      */
-    public boolean getBoolean(@NonNull final String key) {
-        return getBoolean(key, false);
+    fun getBoolean(key: String): Boolean {
+        return getBoolean(key, false)
     }
 
     /**
@@ -205,10 +168,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the boolean value if sp exists or {@code defaultValue} otherwise
+     * @return the boolean value if sp exists or `defaultValue` otherwise
      */
-    public boolean getBoolean(@NonNull final String key, final boolean defaultValue) {
-        return sp.getBoolean(key, defaultValue);
+    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
+        return sp.getBoolean(key, defaultValue)
     }
 
     /**
@@ -217,8 +180,8 @@ public class SPUtils {
      * @param key   The key of sp.
      * @param value The value of sp.
      */
-    public void putStringSet(@NonNull final String key, final Set<String> value) {
-        sp.edit().putStringSet(key, value).apply();
+    fun putStringSet(key: String, value: Set<String?>?) {
+        sp.edit().putStringSet(key, value).apply()
     }
 
     /**
@@ -226,10 +189,10 @@ public class SPUtils {
      *
      * @param key The key of sp.
      * @return the set of string value if sp exists
-     * or {@code Collections.<String>emptySet()} otherwise
+     * or `Collections.<String>emptySet()` otherwise
      */
-    public Set<String> getStringSet(@NonNull final String key) {
-        return getStringSet(key, Collections.<String>emptySet());
+    fun getStringSet(key: String): Set<String>? {
+        return getStringSet(key, emptySet<String>())
     }
 
     /**
@@ -237,10 +200,10 @@ public class SPUtils {
      *
      * @param key          The key of sp.
      * @param defaultValue The default value if the sp doesn't exist.
-     * @return the set of string value if sp exists or {@code defaultValue} otherwise
+     * @return the set of string value if sp exists or `defaultValue` otherwise
      */
-    public Set<String> getStringSet(@NonNull final String key, final Set<String> defaultValue) {
-        return sp.getStringSet(key, defaultValue);
+    fun getStringSet(key: String, defaultValue: Set<String?>?): Set<String>? {
+        return sp.getStringSet(key, defaultValue)
     }
 
     /**
@@ -248,18 +211,17 @@ public class SPUtils {
      *
      * @return all values in sp
      */
-    public Map<String, ?> getAll() {
-        return sp.getAll();
-    }
+    val all: Map<String, *>
+        get() = sp.all
 
     /**
      * Return whether the sp contains the preference.
      *
      * @param key The key of sp.
-     * @return {@code true}: yes<br>{@code false}: no
+     * @return `true`: yes<br></br>`false`: no
      */
-    public boolean contains(@NonNull final String key) {
-        return sp.contains(key);
+    operator fun contains(key: String): Boolean {
+        return sp.contains(key)
     }
 
     /**
@@ -267,30 +229,65 @@ public class SPUtils {
      *
      * @param key The key of sp.
      */
-    public void remove(@NonNull final String key) {
-        sp.edit().remove(key).apply();
+    fun remove(key: String) {
+        sp.edit().remove(key).apply()
     }
 
     /**
      * Remove all preferences in sp.
      */
-    public void clear() {
-        sp.edit().clear().apply();
+    fun clear() {
+        sp.edit().clear().apply()
     }
 
-    /**
-     * 检测字符串是否为空白字符串
-     *
-     * @param s 待校验的字符串
-     * @return 检测结果
-     */
-    private static boolean isSpace(final String s) {
-        if (s == null) return true;
-        for (int i = 0, len = s.length(); i < len; ++i) {
-            if (!Character.isWhitespace(s.charAt(i))) {
-                return false;
-            }
+    companion object {
+        private val SP_UTILS_MAP = SimpleArrayMap<String, SPUtils>()
+
+        /**
+         * Return the single [SPUtils] instance
+         *
+         * @param spName The name of sp.
+         * @return the single [SPUtils] instance
+         */
+        fun getInstance(context: Context, spName: String): SPUtils {
+            return getInstance(context, spName, Context.MODE_PRIVATE)
         }
-        return true;
+
+        /**
+         * Return the single [SPUtils] instance
+         *
+         * @param spName The name of sp.
+         * @param mode   Operating mode.
+         * @return the single [SPUtils] instance
+         */
+        fun getInstance(context: Context, spName: String, mode: Int): SPUtils {
+            var spName = spName
+            if (isSpace(spName)) spName = "spUtils"
+            var spUtils = SP_UTILS_MAP[spName]
+            if (spUtils == null) {
+                spUtils = SPUtils(context, spName, mode)
+                SP_UTILS_MAP.put(spName, spUtils)
+            }
+            return spUtils
+        }
+
+        /**
+         * 检测字符串是否为空白字符串
+         *
+         * @param s 待校验的字符串
+         * @return 检测结果
+         */
+        private fun isSpace(s: String?): Boolean {
+            if (s == null) return true
+            var i = 0
+            val len = s.length
+            while (i < len) {
+                if (!Character.isWhitespace(s[i])) {
+                    return false
+                }
+                ++i
+            }
+            return true
+        }
     }
 }

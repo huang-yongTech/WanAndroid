@@ -1,101 +1,75 @@
-package com.hy.wanandroid.library.base;
+package com.hy.wanandroid.library.base
 
-import android.annotation.SuppressLint;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-import com.hy.wanandroid.library.R;
-import com.hy.wanandroid.library.util.BarUtils;
-
-import java.util.Objects;
+import android.view.ViewGroup
+import android.os.Bundle
+import com.hy.wanandroid.library.util.BarUtils
+import com.hy.wanandroid.library.R
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.view.MotionEvent
+import android.view.View
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 
 /**
  * BaseFragment
  */
-public abstract class BaseFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+abstract class BaseFragment protected constructor() : Fragment() {
+    private val mParam1: String? = null
+    private val mParam2: String? = null
+    private var mStatusBarView: View? = null
+    private val mViewGroup: ViewGroup? = null
 
-    private String mParam1;
-    private String mParam2;
-
-    private View mStatusBarView;
-    private ViewGroup mViewGroup;
-
-    protected BaseFragment() {
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        addStatusBar();
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        addStatusBar()
     }
 
     /**
      * 添加一个空的状态栏
      */
-    private void addStatusBar() {
+    private fun addStatusBar() {
         if (mStatusBarView == null) {
-            mStatusBarView = new View(getContext());
-            int screenWidth = getResources().getDisplayMetrics().widthPixels;
-            int statusBarHeight = BarUtils.getStatusBarHeight(requireContext());
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(screenWidth, statusBarHeight);
-            mStatusBarView.setLayoutParams(params);
-            mStatusBarView.setBackgroundColor(Color.BLACK);
-            mStatusBarView.requestLayout();
-            if (mViewGroup != null)
-                mViewGroup.addView(mStatusBarView, 0);
+            mStatusBarView = View(context)
+            val screenWidth = resources.displayMetrics.widthPixels
+            val statusBarHeight = BarUtils.getStatusBarHeight(requireContext())
+            val params = ViewGroup.LayoutParams(screenWidth, statusBarHeight)
+            mStatusBarView!!.layoutParams = params
+            mStatusBarView!!.setBackgroundColor(Color.BLACK)
+            mStatusBarView!!.requestLayout()
+            mViewGroup?.addView(mStatusBarView, 0)
         }
     }
 
     /**
      * 正在加载中界面
      */
-    protected View getLoadingView(ViewGroup viewGroup) {
-        return getLayoutInflater().inflate(R.layout.view_loading, viewGroup, false);
+    protected fun getLoadingView(viewGroup: ViewGroup?): View {
+        return layoutInflater.inflate(R.layout.view_loading, viewGroup, false)
     }
 
     /**
      * 空数据界面
      */
-    protected View getEmptyDataView(ViewGroup viewGroup) {
-        View notDataView = getLayoutInflater().inflate(R.layout.view_empty, viewGroup, false);
-        notDataView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getData();
-            }
-        });
-        return notDataView;
+    protected fun getEmptyDataView(viewGroup: ViewGroup?): View {
+        val notDataView = layoutInflater.inflate(R.layout.view_empty, viewGroup, false)
+        notDataView.setOnClickListener { getData() }
+        return notDataView
     }
 
     /**
      * 加载数据出错界面
      */
-    protected View getErrorView(ViewGroup viewGroup) {
-        View errorView = getLayoutInflater().inflate(R.layout.view_network_error, viewGroup, false);
-        errorView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getData();
-            }
-        });
-        return errorView;
+    protected fun getErrorView(viewGroup: ViewGroup?): View {
+        val errorView = layoutInflater.inflate(R.layout.view_network_error, viewGroup, false)
+        errorView.setOnClickListener { getData() }
+        return errorView
     }
 
     /**
      * 获取并刷新数据（子类可实现该方法）
      */
-    protected abstract void getData();
+    protected abstract fun getData()
 
     /**
      * TextView等组件drawableEnd图标的点击事件
@@ -103,27 +77,28 @@ public abstract class BaseFragment extends Fragment {
      * @param tv tv
      */
     @SuppressLint("ClickableViewAccessibility")
-    protected void clickRightClear(final TextView tv) {
-        tv.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    return clickRightClear(tv, event);
-                }
-                return false;
-            }
-        });
+    protected fun clickRightClear(tv: TextView?) {
+        tv?.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                clickRightClear(tv, event)
+            } else false
+        }
     }
 
     /**
      * TextView右侧drawable图片清空按钮点击事件处理
      */
-    private boolean clickRightClear(TextView tv, MotionEvent event) {
-        Drawable drawableRight = tv.getCompoundDrawables()[2];
-        if (drawableRight != null && event.getRawX() >= (tv.getRight() - drawableRight.getBounds().width())) {
-            tv.setText(null);
-            return true;
+    private fun clickRightClear(tv: TextView, event: MotionEvent): Boolean {
+        val drawableRight = tv.compoundDrawables[2]
+        if (drawableRight != null && event.rawX >= tv.right - drawableRight.bounds.width()) {
+            tv.text = null
+            return true
         }
-        return false;
+        return false
+    }
+
+    companion object {
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
     }
 }
