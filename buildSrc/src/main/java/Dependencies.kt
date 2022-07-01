@@ -9,7 +9,8 @@ object Versions {
     const val testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     //kotlin
-    const val ktxCoreVersion = "1.2.0"
+    const val ktxCoreVersion = "1.6.0"
+    const val ktxCoroutine = "1.3.9"
 
     //android libraries
     const val appcompatVersion = "1.1.0"
@@ -24,12 +25,12 @@ object Versions {
     const val pagingVersion = "2.1.2"
 
     //third libraries
-    const val rxJavaVersion = "2.2.2"
-    const val rxAndroidVersion = "2.1.0"
-    const val retrofitVersion = "2.4.0"
-    const val adapterRxjavaVersion = "2.4.0"
-    const val converterGsonVersion = "2.4.0"
-    const val okHttpVersion = "3.10.0"
+    const val rxJavaVersion = "2.2.10"
+    const val rxAndroidVersion = "2.1.1"
+    const val retrofitVersion = "2.9.0"
+    const val adapterRxjavaVersion = "2.9.0"
+    const val converterGsonVersion = "2.9.0"
+    const val okHttpVersion = "4.9.1"
     const val rxbindingVersion = "2.1.1"
     const val rxPermissionVersion = "0.10.2"
 
@@ -84,6 +85,7 @@ object Deps {
     const val flexBoxVersion = "com.google.android:flexbox:${Versions.flexBoxVersion}"
 
     const val ktxCoreVersion = "androidx.core:core-ktx:${Versions.ktxCoreVersion}"
+    const val ktxCoroutineVersion = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.ktxCoroutine}"
 
     //third libraries
     const val glideVersion = "com.github.bumptech.glide:glide:${Versions.glideVersion}"

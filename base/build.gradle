@@ -41,8 +41,8 @@ dependencies {
     api Deps.constraintLayoutVersion
 
     api Deps.pagingVersion
-    implementation "androidx.core:core-ktx:+"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api Deps.ktxCoreVersion
+    api Deps.ktxCoroutineVersion
 }
 repositories {
     mavenCentral()

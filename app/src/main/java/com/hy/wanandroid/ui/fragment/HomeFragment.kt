@@ -15,6 +15,10 @@ import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * 首页fragment
@@ -121,14 +125,18 @@ class HomeFragment : BaseFragment() {
     override fun getData() {
         mAdapter?.setEmptyView(getLoadingView(mBinding?.homeRecyclerView))
         currPage = 0
-        mHomeViewModel?.queryHomeArticleList(currPage)
-            ?.observe(viewLifecycleOwner, Observer { pageDataJsonRootBean ->
-                if (pageDataJsonRootBean != null) {
-                    mAdapter?.setNewData(pageDataJsonRootBean.data?.datas)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val articleResult = mHomeViewModel?.queryHomeArticleList(currPage)
+                if (articleResult != null) {
+                    mAdapter?.setNewData(articleResult.data?.datas)
                 } else {
                     mAdapter?.setEmptyView(getEmptyDataView(mBinding?.homeRecyclerView))
                 }
-            })
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     /**
@@ -136,15 +144,15 @@ class HomeFragment : BaseFragment() {
      */
     private fun loadMore() {
         currPage++
-        mHomeViewModel?.queryHomeArticleList(currPage)
-            ?.observe(viewLifecycleOwner, Observer { pageDataJsonRootBean ->
-                if (pageDataJsonRootBean != null) {
-                    pageDataJsonRootBean.data?.datas?.let { mAdapter?.addData(it) }
-                    mAdapter?.loadMoreModule?.loadMoreComplete()
-                } else {
-                    mAdapter?.loadMoreModule?.loadMoreEnd()
-                }
-            })
+        CoroutineScope(Dispatchers.Main).launch {
+            val articleResult = mHomeViewModel?.queryHomeArticleList(currPage)
+            if (articleResult != null) {
+                articleResult.data?.datas?.let { mAdapter?.addData(it) }
+                mAdapter?.loadMoreModule?.loadMoreComplete()
+            } else {
+                mAdapter?.loadMoreModule?.loadMoreEnd()
+            }
+        }
     }
 
     companion object {

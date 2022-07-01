@@ -30,11 +30,11 @@ class LiveDataCallAdapterFactory : Factory() {
         retrofit: Retrofit
     ): CallAdapter<*, *>? {
         if (returnType !is ParameterizedType) {
-            throw IllegalArgumentException("resource must be parameterized")
+            return null
         }
         val returnClass = getRawType(returnType)
         if (returnClass != LiveData::class.java) {
-            throw IllegalArgumentException("return class must be LiveData")
+            return null
         }
         val bodyType = getParameterUpperBound(0, returnType)
         return LiveDataCallAdapter<Any>(bodyType)

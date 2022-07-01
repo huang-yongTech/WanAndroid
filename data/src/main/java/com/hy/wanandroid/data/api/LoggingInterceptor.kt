@@ -18,12 +18,12 @@ class LoggingInterceptor : Interceptor {
     @kotlin.Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val headers = request.headers()
+        val headers = request.headers
         val names = headers.names()
         val headMap = StringBuilder()
         if (names.size > 0) {
             for (key in names) {
-                val value = headers[key!!]
+                val value = headers[key]
                 headMap.append(" ")
                     .append(key)
                     .append(":")
@@ -32,7 +32,7 @@ class LoggingInterceptor : Interceptor {
             }
         }
         var body = ""
-        val requestBody = request.body()
+        val requestBody = request.body
         if (requestBody != null) {
             val buffer = Buffer()
             requestBody.writeTo(buffer)
@@ -49,7 +49,7 @@ class LoggingInterceptor : Interceptor {
         val startTime = System.currentTimeMillis()
         val response = chain.proceed(request)
         var res = ""
-        val responseBody = response.body()
+        val responseBody = response.body
         var contentType: MediaType? = null
         if (responseBody != null) {
             contentType = responseBody.contentType()
@@ -72,8 +72,8 @@ class LoggingInterceptor : Interceptor {
         Log.e(
             "--", """
      
-     响应: code:${response.code()}
-     url：${response.request().url()}
+     响应: code:${response.code}
+     url：${response.request.url}
      heads:$headMap
      请求：$body
      返回: $res

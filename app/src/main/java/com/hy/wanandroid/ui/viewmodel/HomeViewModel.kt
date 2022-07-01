@@ -11,6 +11,9 @@ import androidx.lifecycle.LiveData
 import com.hy.wanandroid.data.api.RetrofitUtils
 import com.hy.wanandroid.data.api.HomeApi
 import androidx.navigation.Navigation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 /**
  * author：created by huangyong on 2020/3/26 11:23
@@ -20,11 +23,13 @@ import androidx.navigation.Navigation
 class HomeViewModel : ViewModel() {
     //侧滑菜单打开标志
     val mOpenDrawer = MutableLiveData<Boolean>()
-    fun queryHomeArticleList(page: Int): LiveData<JsonRootBean<PageData<Article?>?>?>? {
-        return RetrofitUtils.instance
-            .getApiService(HomeApi::class.java)
-            .queryHomeArticleList(page)
-    }
+    suspend fun queryHomeArticleList(page: Int): JsonRootBean<PageData<Article?>?>? =
+        withContext(Dispatchers.IO) {
+            RetrofitUtils.instance
+                .getApiService(HomeApi::class.java)
+                .queryHomeArticleList(page)
+        }
+
 
     /**
      * 点击事件
