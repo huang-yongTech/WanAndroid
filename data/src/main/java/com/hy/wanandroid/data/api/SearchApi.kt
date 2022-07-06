@@ -32,8 +32,8 @@ interface SearchApi {
      */
     @FormUrlEncoded
     @POST("article/query/{page}/json")
-    fun queryArticlesByKey(
+    suspend fun queryArticlesByKey(
         @Path("page") page: Int,
         @Field("k") key: String?
-    ): LiveData<JsonRootBean<Any?>?>?
+    ): JsonRootBean<Any?>?
 }

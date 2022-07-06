@@ -38,7 +38,6 @@ class RetrofitUtils private constructor() {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addCallAdapterFactory(LiveDataCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

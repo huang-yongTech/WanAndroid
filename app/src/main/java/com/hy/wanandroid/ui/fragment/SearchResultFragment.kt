@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.ui.click.PublicClickProxy
 import com.hy.wanandroid.library.util.BarUtils
@@ -18,10 +21,12 @@ import com.google.gson.reflect.TypeToken
 import com.hy.wanandroid.data.bean.Article
 import com.hy.wanandroid.data.bean.JsonRootBean
 import com.hy.wanandroid.data.bean.PageData
-import com.hy.wanandroid.data.bean.ResultObserver
+import com.hy.wanandroid.data.state.UiState
 import com.hy.wanandroid.library.util.Constant
 import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchResultBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * 搜索结果界面
@@ -55,6 +60,7 @@ class SearchResultFragment : BaseFragment() {
         )
         initRefreshLayout()
         initRecyclerView()
+        observeData()
         getData()
         return view
     }
@@ -79,6 +85,32 @@ class SearchResultFragment : BaseFragment() {
         mBinding?.searchResultRecyclerView?.adapter = mAdapter
     }
 
+    private fun observeData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mViewModel?.searchArticle?.collect {
+                    when (it) {
+                        is UiState.Success<*> -> {
+                            val json = GsonUtils.toJson(it.result)
+                            Log.e(TAG, "onCodeSuccess: json = $json")
+                            val result = GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
+                                json,
+                                object : TypeToken<JsonRootBean<PageData<Article>>>() {}.type
+                            )
+                            mAdapter?.setNewData(result?.data?.datas)
+                            if (result?.data?.pageCount == 1) {
+                                mAdapter?.loadMoreModule?.loadMoreEnd()
+                            }
+                        }
+                        is UiState.Error<*> -> {
+                            mAdapter?.setEmptyView(getErrorView(mBinding?.searchResultRecyclerView))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * 加载更多
      */
@@ -86,35 +118,7 @@ class SearchResultFragment : BaseFragment() {
     override fun getData() {
         Log.e(TAG, "getData: 获取数据")
         mAdapter?.setEmptyView(getLoadingView(mBinding?.searchResultRecyclerView))
-        mViewModel?.queryArticlesByKey(0, mSearchKey)
-            ?.observe(viewLifecycleOwner, object : ResultObserver<JsonRootBean<Any?>?>() {
-                override fun onCodeSuccess(result: JsonRootBean<Any?>?) {
-                    val json = GsonUtils.toJson(result?.data)
-                    Log.e(TAG, "onCodeSuccess: json = $json")
-                    val pageResult = GsonUtils.fromJson<PageData<Article>>(
-                        json,
-                        object : TypeToken<PageData<Article>>() {}.type
-                    )
-                    mAdapter?.setNewData(pageResult?.datas)
-                    if (pageResult?.pageCount == 1) {
-                        mAdapter?.loadMoreModule?.loadMoreEnd()
-                    }
-                }
-
-                override fun onError(result: JsonRootBean<Any?>?) {
-                    mAdapter?.setEmptyView(getEmptyDataView(mBinding?.searchResultRecyclerView))
-                }
-            })
-//            { pageDataJsonRootBean ->
-//                if (pageDataJsonRootBean != null) {
-//                    mAdapter?.setNewData(pageDataJsonRootBean.data?.datas)
-//                    if (pageDataJsonRootBean.data?.pageCount == 1) {
-//                        mAdapter?.loadMoreModule?.loadMoreEnd()
-//                    }
-//                } else {
-//                    mAdapter?.setEmptyView(getEmptyDataView(mBinding?.searchResultRecyclerView))
-//                }
-//            }
+        mViewModel?.queryArticlesByKey(0, key = mSearchKey, isLoadMore = false)
     }
 
     companion object {
