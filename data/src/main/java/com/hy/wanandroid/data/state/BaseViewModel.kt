@@ -45,7 +45,6 @@ open class BaseViewModel : ViewModel() {
         }
         val result = JsonRootBean<Any?>()
         result.errorMsg = errorMsg
-        result.errorCode = RandomUtils.INSTANCE.random(0, 100)
         return result
     }
 
