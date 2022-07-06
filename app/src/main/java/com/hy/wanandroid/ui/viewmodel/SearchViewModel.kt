@@ -13,10 +13,16 @@ import com.hy.wanandroid.data.bean.HotWord
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.hy.wanandroid.data.dao.SearchHistoryDataSource
 import com.hy.wanandroid.data.bean.JsonListRootBean
+import com.hy.wanandroid.data.state.BaseAndroidViewModel
+import com.hy.wanandroid.data.state.UiState
 import com.hy.wanandroid.library.util.Constant
 import com.hy.wanandroid.library.util.KeyboardUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.ArrayList
 
 /**
@@ -24,7 +30,7 @@ import java.util.ArrayList
  * email：756655135@qq.com
  * description :
  */
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
+class SearchViewModel(application: Application) : BaseAndroidViewModel(application) {
     //搜索历史
     val mHistoryKeyList = ObservableField<MutableList<HotWord?>?>(ArrayList())
 
@@ -35,23 +41,45 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     //搜索框绑定
     @JvmField
     val mSearchKey = ObservableField<String>()
+
+    /**
+     * 搜索历史记录
+     */
     private val mHistoryDataSource: SearchHistoryDataSource = SearchHistoryDataSource(application)
     private fun insertSearchKey(hotWord: HotWord) {
         mHistoryDataSource.insertSearchKey(hotWord)
     }
 
-    val historyKey: LiveData<MutableList<HotWord?>?>?
-        get() = mHistoryDataSource.historyKey
+    fun getHistoryKey(): LiveData<MutableList<HotWord?>?>? {
+        return mHistoryDataSource.getHistoryKey()
+    }
+
+    /**
+     * 搜索热词状态
+     */
+    private val _hotWordsState = MutableStateFlow<UiState>(UiState.Success(null))
+    var hotWordsState = _hotWordsState
 
     /**
      * 获取热搜词
-     *
-     * @return 结果集
      */
-    val hotWords: LiveData<JsonListRootBean<HotWord?>?>?
-        get() = RetrofitUtils.instance
-            .getApiService(SearchApi::class.java)
-            .hotWords
+    fun getHotWords() {
+        viewModelScope.launch {
+            flow {
+                val wordsData = RetrofitUtils.instance
+                    .getApiService(SearchApi::class.java)
+                    .getHotWords()
+                emit(wordsData)
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { exception ->
+                    _hotWordsState.value = UiState.Error(handleObjError(exception))
+                }
+                .collect {
+                    _hotWordsState.value = UiState.Success(it)
+                }
+        }
+    }
 
     /**
      * 点击事件

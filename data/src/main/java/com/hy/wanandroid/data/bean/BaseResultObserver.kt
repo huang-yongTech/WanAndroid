@@ -11,14 +11,14 @@ import com.hy.wanandroid.data.state.UiState
 abstract class BaseResultObserver<T> : Observer<T> where T : UiState {
     override fun onChanged(t: T?) {
         when (t) {
-            is UiState.Success -> onCodeSuccess(t)
-            is UiState.Error -> onError(t)
+            is UiState.Success<*> -> onCodeSuccess(t)
+            is UiState.Error<*> -> onError(t)
         }
     }
 
-    abstract fun onCodeSuccess(result: UiState.Success?)
+    abstract fun onCodeSuccess(result: UiState.Success<*>?)
 
 //    abstract fun onCodeError(result: UiState.CodeError?)
 
-    abstract fun onError(result: UiState.Error?)
+    abstract fun onError(result: UiState.Error<*>?)
 }

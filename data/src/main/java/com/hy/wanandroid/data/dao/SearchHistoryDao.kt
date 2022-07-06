@@ -17,6 +17,6 @@ interface SearchHistoryDao {
     @Query("delete from hot_word")
     fun deleteKeys()
 
-    @get:Query("select * from hot_word")
-    val historyKey: LiveData<MutableList<HotWord?>?>?
+    @Query("select * from hot_word")
+    fun getHistoryKey() : LiveData<MutableList<HotWord?>?>?
 }

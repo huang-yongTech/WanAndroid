@@ -4,7 +4,6 @@ import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.viewmodel.SearchViewModel
 import com.hy.wanandroid.ui.adapter.SearchKeyAdapter
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.hy.wanandroid.ui.R
@@ -14,10 +13,15 @@ import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
+import com.google.gson.reflect.TypeToken
 import com.hy.wanandroid.data.bean.HotWord
+import com.hy.wanandroid.data.bean.JsonListRootBean
+import com.hy.wanandroid.data.state.UiState
 import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * 查找界面fragment
@@ -91,17 +95,41 @@ class SearchFragment : BaseFragment() {
             val name = mHotKeyAdapter?.data?.get(position)?.name
             mSearchViewModel?.mSearchKey?.set(name)
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mSearchViewModel?.hotWordsState?.collect {
+                    when (it) {
+                        is UiState.Success<*> -> {
+                            val json = GsonUtils.toJson(it.result)
+                            val hotWordsData = GsonUtils.fromJson<JsonListRootBean<HotWord?>>(
+                                json,
+                                object : TypeToken<JsonListRootBean<HotWord?>>() {}.type
+                            )
+                            mHotKeyAdapter?.setNewData(hotWordsData?.data)
+                        }
+                        is UiState.Error<*> -> {
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun getData() {
-        mSearchViewModel?.historyKey?.observe(
-            viewLifecycleOwner
-        ) { hotWords -> mHistoryAdapter?.setNewData(hotWords) }
-        mSearchViewModel?.hotWords?.observe(
-            viewLifecycleOwner
-        ) { hotWordJsonListRootBean ->
-            mHotKeyAdapter?.setNewData(hotWordJsonListRootBean?.data)
-        }
+        mSearchViewModel?.getHistoryKey()?.observe(
+            viewLifecycleOwner, Observer<MutableList<HotWord?>?> {
+                mHistoryAdapter?.setNewData(it)
+            }
+        )
+
+        mSearchViewModel?.getHotWords()
+//        (
+//            viewLifecycleOwner
+//        ) { hotWordJsonListRootBean ->
+//            mHotKeyAdapter?.setNewData(hotWordJsonListRootBean?.data)
+//        }
     }
 
     companion object {

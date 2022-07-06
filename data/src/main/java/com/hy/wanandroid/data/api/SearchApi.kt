@@ -20,8 +20,8 @@ interface SearchApi {
      *
      * @return 结果集
      */
-    @get:GET("hotkey/json")
-    val hotWords: LiveData<JsonListRootBean<HotWord?>?>?
+    @GET("hotkey/json")
+    suspend fun getHotWords(): JsonListRootBean<HotWord?>?
 
     /**
      * 根据关键词查找文章

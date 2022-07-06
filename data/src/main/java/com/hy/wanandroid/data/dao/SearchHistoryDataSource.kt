@@ -24,8 +24,9 @@ class SearchHistoryDataSource(application: Application) {
         AppDatabase.DATABASE_WRITE_EXECUTOR?.execute { historyDao?.deleteKeys() }
     }
 
-    val historyKey: LiveData<MutableList<HotWord?>?>?
-        get() = historyDao?.historyKey
+    fun getHistoryKey(): LiveData<MutableList<HotWord?>?>? {
+        return historyDao?.getHistoryKey()
+    }
 
     init {
         val database: AppDatabase? = AppDatabase.getInstance(application)

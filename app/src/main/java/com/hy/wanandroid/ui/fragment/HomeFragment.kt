@@ -160,7 +160,7 @@ class HomeFragment : BaseFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mHomeViewModel?.mHomeArticleState?.collect { uiState: UiState ->
                     when (uiState) {
-                        is UiState.Success -> {
+                        is UiState.Success<*> -> {
                             if (uiState.result == null) {
                                 mAdapter?.setEmptyView(getEmptyDataView(mBinding?.homeRecyclerView))
                             } else {
@@ -184,7 +184,7 @@ class HomeFragment : BaseFragment() {
                                 }
                             }
                         }
-                        is UiState.Error -> {
+                        is UiState.Error<*> -> {
                             mAdapter?.setEmptyView(getErrorView(mBinding?.homeRecyclerView))
                         }
                         else -> {}
