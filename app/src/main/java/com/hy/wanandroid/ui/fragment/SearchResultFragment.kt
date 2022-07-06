@@ -4,6 +4,7 @@ import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.viewmodel.SearchResultViewModel
 import com.hy.wanandroid.ui.adapter.ArticleListAdapter
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +14,14 @@ import com.hy.wanandroid.ui.click.PublicClickProxy
 import com.hy.wanandroid.library.util.BarUtils
 import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
-import androidx.lifecycle.Observer
+import com.google.gson.reflect.TypeToken
+import com.hy.wanandroid.data.bean.Article
+import com.hy.wanandroid.data.bean.JsonRootBean
+import com.hy.wanandroid.data.bean.PageData
+import com.hy.wanandroid.data.bean.ResultObserver
 import com.hy.wanandroid.library.util.Constant
+import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchResultBinding
-import java.util.*
 
 /**
  * 搜索结果界面
@@ -44,15 +49,14 @@ class SearchResultFragment : BaseFragment() {
         mBinding?.vm = mViewModel
         mBinding?.searchResultInclude?.clickProxy = PublicClickProxy()
         mBinding?.searchResultInclude?.title = mSearchKey
-        BarUtils.setAppToolBarMarginTop(requireContext(), mBinding?.searchResultInclude?.publicToolbar)
+        BarUtils.setAppToolBarMarginTop(
+            requireContext(),
+            mBinding?.searchResultInclude?.publicToolbar
+        )
         initRefreshLayout()
         initRecyclerView()
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         getData()
+        return view
     }
 
     private fun initRefreshLayout() {
@@ -80,18 +84,37 @@ class SearchResultFragment : BaseFragment() {
      */
     private fun loadMore() {}
     override fun getData() {
+        Log.e(TAG, "getData: 获取数据")
         mAdapter?.setEmptyView(getLoadingView(mBinding?.searchResultRecyclerView))
         mViewModel?.queryArticlesByKey(0, mSearchKey)
-            ?.observe(viewLifecycleOwner) { pageDataJsonRootBean ->
-                if (pageDataJsonRootBean != null) {
-                    mAdapter?.setNewData(pageDataJsonRootBean.data?.datas)
-                    if (pageDataJsonRootBean.data?.pageCount == 1) {
+            ?.observe(viewLifecycleOwner, object : ResultObserver<JsonRootBean<Any?>?>() {
+                override fun onCodeSuccess(result: JsonRootBean<Any?>?) {
+                    val json = GsonUtils.toJson(result?.data)
+                    Log.e(TAG, "onCodeSuccess: json = $json")
+                    val pageResult = GsonUtils.fromJson<PageData<Article>>(
+                        json,
+                        object : TypeToken<PageData<Article>>() {}.type
+                    )
+                    mAdapter?.setNewData(pageResult?.datas)
+                    if (pageResult?.pageCount == 1) {
                         mAdapter?.loadMoreModule?.loadMoreEnd()
                     }
-                } else {
+                }
+
+                override fun onError(result: JsonRootBean<Any?>?) {
                     mAdapter?.setEmptyView(getEmptyDataView(mBinding?.searchResultRecyclerView))
                 }
-            }
+            })
+//            { pageDataJsonRootBean ->
+//                if (pageDataJsonRootBean != null) {
+//                    mAdapter?.setNewData(pageDataJsonRootBean.data?.datas)
+//                    if (pageDataJsonRootBean.data?.pageCount == 1) {
+//                        mAdapter?.loadMoreModule?.loadMoreEnd()
+//                    }
+//                } else {
+//                    mAdapter?.setEmptyView(getEmptyDataView(mBinding?.searchResultRecyclerView))
+//                }
+//            }
     }
 
     companion object {

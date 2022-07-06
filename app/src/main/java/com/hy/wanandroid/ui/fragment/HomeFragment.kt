@@ -4,19 +4,20 @@ import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.viewmodel.HomeViewModel
 import com.hy.wanandroid.ui.adapter.ArticleListAdapter
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.GravityCompat
-import androidx.lifecycle.Observer
-import com.hy.wanandroid.data.bean.Article
+import androidx.lifecycle.*
+import com.google.gson.reflect.TypeToken
+import com.hy.wanandroid.data.bean.*
+import com.hy.wanandroid.data.state.UiState
+import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -74,12 +75,9 @@ class HomeFragment : BaseFragment() {
         initRefresh()
         initAdapter()
         initRecyclerView()
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         getData()
+        Log.e(TAG, "onCreateView: ")
+        return view
     }
 
     private fun initDrawer() {
@@ -110,6 +108,91 @@ class HomeFragment : BaseFragment() {
             )
         )
         mBinding?.homeRecyclerView?.adapter = mAdapter
+
+//        mHomeViewModel?.mArticleData?.observe(
+//            viewLifecycleOwner,
+//            object : BaseResultObserver<UiState>() {
+//                override fun onCodeSuccess(result: UiState.Success?) {
+//                    val json = GsonUtils.toJson(result?.result)
+//                    val articleData =
+//                        GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
+//                            json,
+//                            object : TypeToken<JsonRootBean<PageData<Article>>>() {
+//                            }.type
+//                        )
+//
+//                    if (articleData == null) {
+//                        mAdapter?.loadMoreModule?.loadMoreEnd()
+//                    } else {
+//                        mAdapter?.loadMoreModule?.loadMoreComplete()
+//                    }
+//
+//                    if (mHomeViewModel?.isLoadMore == true) {
+//                        articleData?.data?.datas?.let { mAdapter?.addData(it) }
+//                    } else {
+//                        mAdapter?.setNewData(articleData?.data?.datas)
+//                    }
+//                }
+//
+//                override fun onError(result: UiState.Error?) {
+//                    mAdapter?.setEmptyView(getErrorView(mBinding?.homeRecyclerView))
+//                }
+//            })
+
+//        mHomeViewModel?.mHomeArticleData?.observe(viewLifecycleOwner, object : ResultObserver<JsonRootBean<Any?>?>() {
+//            override fun onCodeSuccess(result: JsonRootBean<Any?>?) {
+//                val json = GsonUtils.toJson(result)
+//                                val articleData =
+//                                    GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
+//                                        json,
+//                                        object : TypeToken<JsonRootBean<PageData<Article>>>() {
+//                                        }.type
+//                                    )
+//                                mAdapter?.setNewData(articleData?.data?.datas)
+//            }
+//
+//            override fun onError(result: JsonRootBean<Any?>?) {
+//                mAdapter?.setEmptyView(getErrorView(mBinding?.homeRecyclerView))
+//            }
+//        })
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mHomeViewModel?.mHomeArticleState?.collect { uiState: UiState ->
+                    when (uiState) {
+                        is UiState.Success -> {
+                            if (uiState.result == null) {
+                                mAdapter?.setEmptyView(getEmptyDataView(mBinding?.homeRecyclerView))
+                            } else {
+                                val json = GsonUtils.toJson(uiState.result)
+                                val articleData =
+                                    GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
+                                        json,
+                                        object : TypeToken<JsonRootBean<PageData<Article>>>() {
+                                        }.type
+                                    )
+                                if (articleData == null) {
+                                    mAdapter?.loadMoreModule?.loadMoreEnd()
+                                } else {
+                                    mAdapter?.loadMoreModule?.loadMoreComplete()
+                                }
+
+                                if (mHomeViewModel?.isLoadMore == true) {
+                                    articleData?.data?.datas?.let { mAdapter?.addData(it) }
+                                } else {
+                                    mAdapter?.setNewData(articleData?.data?.datas)
+                                }
+                            }
+                        }
+                        is UiState.Error -> {
+                            mAdapter?.setEmptyView(getErrorView(mBinding?.homeRecyclerView))
+                        }
+                        else -> {}
+                    }
+
+                }
+            }
+        }
     }
 
     private fun initRefresh() {
@@ -125,18 +208,15 @@ class HomeFragment : BaseFragment() {
     override fun getData() {
         mAdapter?.setEmptyView(getLoadingView(mBinding?.homeRecyclerView))
         currPage = 0
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val articleResult = mHomeViewModel?.queryHomeArticleList(currPage)
-                if (articleResult != null) {
-                    mAdapter?.setNewData(articleResult.data?.datas)
-                } else {
-                    mAdapter?.setEmptyView(getEmptyDataView(mBinding?.homeRecyclerView))
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+//        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+//            val json = GsonUtils.toJson(mHomeViewModel?.queryHomeArticleList(currPage))
+//            val articleResult = GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(json,
+//                object : TypeToken<JsonRootBean<PageData<Article>>>() {
+//                }.type
+//            )
+//            mAdapter?.setNewData(articleResult?.data?.datas)
+//        }
+        mHomeViewModel?.queryHomeArticleList(currPage, false)
     }
 
     /**
@@ -144,15 +224,14 @@ class HomeFragment : BaseFragment() {
      */
     private fun loadMore() {
         currPage++
-        CoroutineScope(Dispatchers.Main).launch {
-            val articleResult = mHomeViewModel?.queryHomeArticleList(currPage)
-            if (articleResult != null) {
-                articleResult.data?.datas?.let { mAdapter?.addData(it) }
-                mAdapter?.loadMoreModule?.loadMoreComplete()
-            } else {
-                mAdapter?.loadMoreModule?.loadMoreEnd()
-            }
-        }
+//            val articleResult = mHomeViewModel?.queryHomeArticleList(currPage)
+//            if (articleResult != null) {
+//                articleResult.data?.datas?.let { mAdapter?.addData(it) }
+//                mAdapter?.loadMoreModule?.loadMoreComplete()
+//            } else {
+//                mAdapter?.loadMoreModule?.loadMoreEnd()
+//            }
+        mHomeViewModel?.queryHomeArticleList(currPage, true)
     }
 
     companion object {

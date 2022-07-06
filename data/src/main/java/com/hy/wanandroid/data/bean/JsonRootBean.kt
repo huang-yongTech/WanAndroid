@@ -11,10 +11,6 @@ package com.hy.wanandroid.data.bean
  */
 class JsonRootBean<T> {
     var data: T? = null
-        private set
     var errorCode = 0
     var errorMsg: String? = null
-    fun setData(data: T) {
-        this.data = data
-    }
 }

@@ -12,9 +12,11 @@ import com.hy.wanandroid.library.util.BarUtils
 import android.text.TextWatcher
 import android.text.Editable
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.Observer
 import com.hy.wanandroid.data.bean.HotWord
+import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchBinding
 
 /**

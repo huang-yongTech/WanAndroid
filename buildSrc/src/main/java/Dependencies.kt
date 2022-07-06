@@ -11,6 +11,7 @@ object Versions {
     //kotlin
     const val ktxCoreVersion = "1.6.0"
     const val ktxCoroutine = "1.3.9"
+    const val ktxExtension = "2.4.0"
 
     //android libraries
     const val appcompatVersion = "1.1.0"
@@ -33,6 +34,7 @@ object Versions {
     const val okHttpVersion = "4.9.1"
     const val rxbindingVersion = "2.1.1"
     const val rxPermissionVersion = "0.10.2"
+    const val gson = "2.8.7"
 
     const val baseRecyclerViewAdapterHelperVersion = "3.0.1"
     const val smartRefreshlayoutVersion = "1.1.0"
@@ -86,6 +88,9 @@ object Deps {
 
     const val ktxCoreVersion = "androidx.core:core-ktx:${Versions.ktxCoreVersion}"
     const val ktxCoroutineVersion = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.ktxCoroutine}"
+    const val ktxViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.ktxExtension}"
+    const val ktxRuntime = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.ktxExtension}"
+    const val ktxLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.ktxExtension}"
 
     //third libraries
     const val glideVersion = "com.github.bumptech.glide:glide:${Versions.glideVersion}"
@@ -101,6 +106,7 @@ object Deps {
     const val retrofitVersion = "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
     const val adapterRxjavaVersion = "com.squareup.retrofit2:adapter-rxjava2:${Versions.adapterRxjavaVersion}"
     const val converterGsonVersion = "com.squareup.retrofit2:converter-gson:${Versions.converterGsonVersion}"
+    const val gson = "com.google.code.gson:gson:${Versions.gson}"
 
     const val smartRefreshlayoutVersion = "com.scwang.smartrefresh:SmartRefreshLayout:${Versions.smartRefreshlayoutVersion}"
     const val baseRecyclerViewAdapterHelperVersion = "com.github.CymChad:BaseRecyclerViewAdapterHelper:${Versions.baseRecyclerViewAdapterHelperVersion}"

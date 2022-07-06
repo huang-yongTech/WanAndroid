@@ -20,7 +20,7 @@ enum class RandomUtils {
         return Color.rgb(random(min, max), random(min, max), random(min, max))
     }
 
-    private fun random(min: Int, max: Int): Int {
+    fun random(min: Int, max: Int): Int {
         return mRandom.nextInt(max - min + 1) + min
     }
 }

@@ -36,6 +36,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(path: ':base')
+    implementation project(path: ':library')
 
     implementation Deps.roomVersion
     implementation Deps.roomKtxVersion

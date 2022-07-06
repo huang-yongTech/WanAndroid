@@ -35,5 +35,5 @@ interface SearchApi {
     fun queryArticlesByKey(
         @Path("page") page: Int,
         @Field("k") key: String?
-    ): LiveData<JsonRootBean<PageData<Article?>?>?>?
+    ): LiveData<JsonRootBean<Any?>?>?
 }

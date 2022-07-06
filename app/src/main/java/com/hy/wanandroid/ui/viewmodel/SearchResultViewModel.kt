@@ -17,7 +17,7 @@ class SearchResultViewModel : ViewModel() {
     /**
      * 根据关键字搜索文章
      */
-    fun queryArticlesByKey(page: Int, key: String?): LiveData<JsonRootBean<PageData<Article?>?>?>? {
+    fun queryArticlesByKey(page: Int, key: String?): LiveData<JsonRootBean<Any?>?>? {
         return RetrofitUtils.instance
             .getApiService(SearchApi::class.java)
             .queryArticlesByKey(page, key)

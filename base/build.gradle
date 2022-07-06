@@ -43,6 +43,11 @@ dependencies {
     api Deps.pagingVersion
     api Deps.ktxCoreVersion
     api Deps.ktxCoroutineVersion
+    api Deps.ktxViewModel
+    api Deps.ktxRuntime
+    api Deps.ktxLiveData
+
+    api Deps.gson
 }
 repositories {
     mavenCentral()

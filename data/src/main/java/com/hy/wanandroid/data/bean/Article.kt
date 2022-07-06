@@ -37,6 +37,15 @@ class Article {
     var superChapterName: String? = null
     var tags: List<Version>? = null
     var title: String? = null
+        get() {
+            return when {
+                field?.contains("</em>") == true ->
+                    field?.split("</em>")?.get(1)
+                field?.contains("&mdash;") == true ->
+                    field?.replace("&mdash;", "-")
+                else -> return field
+            }
+        }
     var type = 0
     var userId = 0
     var visible = 0

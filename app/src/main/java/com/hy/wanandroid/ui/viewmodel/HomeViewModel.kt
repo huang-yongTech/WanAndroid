@@ -2,34 +2,90 @@ package com.hy.wanandroid.ui.viewmodel
 
 import android.view.View
 import com.hy.wanandroid.ui.R
-import com.hy.wanandroid.data.bean.JsonRootBean
-import com.hy.wanandroid.data.bean.PageData
-import com.hy.wanandroid.data.bean.Article
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.hy.wanandroid.data.api.RetrofitUtils
 import com.hy.wanandroid.data.api.HomeApi
 import androidx.navigation.Navigation
+import com.hy.wanandroid.data.bean.JsonRootBean
+import com.hy.wanandroid.data.state.BaseViewModel
+import com.hy.wanandroid.data.state.UiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 /**
  * author：created by huangyong on 2020/3/26 11:23
  * email：756655135@qq.com
  * description :
  */
-class HomeViewModel : ViewModel() {
+class HomeViewModel : BaseViewModel() {
     //侧滑菜单打开标志
     val mOpenDrawer = MutableLiveData<Boolean>()
-    suspend fun queryHomeArticleList(page: Int): JsonRootBean<PageData<Article?>?>? =
-        withContext(Dispatchers.IO) {
-            RetrofitUtils.instance
-                .getApiService(HomeApi::class.java)
-                .queryHomeArticleList(page)
-        }
 
+    private val _mHomeArticleState = MutableStateFlow<UiState>(UiState.Success(null))
+
+    val mHomeArticleState: StateFlow<UiState> = _mHomeArticleState
+
+    var mHomeArticleData = MutableLiveData<JsonRootBean<Any?>?>(null)
+
+//    suspend fun queryHomeArticleList(page: Int): JsonRootBean<Any?>? {
+//        return withContext(Dispatchers.IO) {
+//            RetrofitUtils.instance
+//                .getApiService(HomeApi::class.java)
+//                .queryHomeArticleList(page)
+//        }
+//    }
+
+    val mArticleData = MutableLiveData<UiState>(UiState.Success(null))
+
+    fun queryHomeArticleList(page: Int, isLoadMore: Boolean) {
+        this.isLoadMore = isLoadMore
+        viewModelScope.launch {
+            getData(page)
+                .flowOn(Dispatchers.IO)
+                .catch { exception ->
+                    _mHomeArticleState.value = UiState.Error(handleObjError(exception))
+                }
+                .collect {
+                    _mHomeArticleState.value = UiState.Success(it)
+                }
+        }
+    }
+
+    private fun getData(page: Int) = flow {
+        val articleData = RetrofitUtils.instance
+            .getApiService(HomeApi::class.java)
+            .queryHomeArticleList(page)
+        emit(articleData)
+    }
+
+//    fun queryHomeArticleList(page: Int) {
+//        getData(page).runCatching {
+//            mHomeArticleData.value = this.value
+//        }.onFailure {
+//            val jsonRootBean = JsonRootBean<Any?>()
+//            jsonRootBean.errorMsg = handleStrError(it)
+//            jsonRootBean.errorCode = -100
+//            mHomeArticleData.value = jsonRootBean
+//        }
+//        viewModelScope.launch {
+//            mHomeArticleData.value = getData(page)
+//        }
+//    }
+
+//    private suspend fun getData(page: Int): JsonRootBean<Any?>? {
+//        return try {
+//            RetrofitUtils.instance
+//                .getApiService(HomeApi::class.java)
+//                .queryHomeArticleList(page)
+//        } catch (e: Throwable) {
+//            val jsonRootBean = JsonRootBean<Any?>()
+//            jsonRootBean.errorMsg = handleStrError(e)
+//            jsonRootBean.errorCode = -100
+//            jsonRootBean
+//        }
+//    }
 
     /**
      * 点击事件

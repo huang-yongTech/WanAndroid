@@ -16,21 +16,24 @@
 
 package com.hy.wanandroid.data.utils
 
-import android.util.Log
+import android.accounts.NetworkErrorException
 import androidx.lifecycle.LiveData
-import retrofit2.Call
-import retrofit2.CallAdapter
-import retrofit2.Callback
-import retrofit2.Response
+import com.hy.wanandroid.data.bean.JsonRootBean
+import com.hy.wanandroid.library.util.Constant
+import retrofit2.*
 import java.lang.reflect.Type
+import java.net.ConnectException
+import java.net.UnknownHostException
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.net.ssl.SSLHandshakeException
 
 /**
  * A Retrofit adapter that converts the Call into a LiveData of ApiResponse.
  * @param <R>
 </R> */
 class LiveDataCallAdapter<R>(private val responseType: Type) :
-        CallAdapter<R, LiveData<R>> {
+    CallAdapter<R, LiveData<R>> {
 
     override fun responseType() = responseType
 
@@ -45,9 +48,34 @@ class LiveDataCallAdapter<R>(private val responseType: Type) :
                             postValue(response.body())
                         }
 
-                        override fun onFailure(call: Call<R>, throwable: Throwable) {
-                            Log.i("LiveDataCallAdapter : ", "数据为空")
-                            postValue(null)
+                        override fun onFailure(call: Call<R>, e: Throwable) {
+                            val errorMessage: String = if (e is TimeoutException) {
+                                // 连接超时
+                                Constant.ERROR_NAME.TIMEOUT_ERROR
+                            } else if (e is ConnectException) {
+                                // 服务器异常
+                                Constant.ERROR_NAME.CONNECT_ERROR
+                            } else if (e is NetworkErrorException) {
+                                // 网络无法连接
+                                Constant.ERROR_NAME.NET_NOT_CONNECT
+                            } else if (e is UnknownHostException) {
+                                //Socket异常
+                                Constant.ERROR_NAME.SOCKET_ERROR
+                            } else if (e is SSLHandshakeException) {
+                                Constant.ERROR_NAME.SSL_ERROR
+                            } else if (e is HttpException) {
+                                if (e.toString().contains("401")) {
+                                    Constant.ERROR_NAME.HTTP_401_ERROR;
+                                } else {
+                                    Constant.ERROR_NAME.SSL_ERROR
+                                }
+                            } else {
+                                Constant.ERROR_NAME.UNKNOWEN_ERROR
+                            }
+                            val httpResult = JsonRootBean<R>()
+                            httpResult.errorMsg = errorMessage
+                            httpResult.errorCode = -1
+                            postValue(httpResult as R)
                         }
                     })
                 }

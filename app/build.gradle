@@ -34,15 +34,15 @@ android {
         debug {
             signingConfig signingConfigs.debugger
 
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             zipAlignEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
     dataBinding {
-        enabled = true;
+        enabled = true
     }
 
     compileOptions {

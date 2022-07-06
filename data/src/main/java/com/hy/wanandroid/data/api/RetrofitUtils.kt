@@ -22,7 +22,7 @@ class RetrofitUtils private constructor() {
     /**
      * 常规网络请求
      */
-    fun <T> getApiService(clazz: Class<T>?): T {
+    fun <T> getApiService(clazz: Class<T>): T {
         val okHttpClient = OkHttpClient.Builder()
             .proxy(Proxy.NO_PROXY)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -31,7 +31,7 @@ class RetrofitUtils private constructor() {
             .addInterceptor(getHttpLoggingInterceptor(true))
             .build()
         val retrofit = buildRetrofit(okHttpClient)
-        return retrofit.create(clazz!!)
+        return retrofit.create(clazz)
     }
 
     private fun buildRetrofit(okHttpClient: OkHttpClient): Retrofit {

@@ -36,4 +36,20 @@ object Constant {
     const val TYPE_PPTX = ".pptx"
     const val TYPE_TXT = ".txt"
     const val TYPE_XLSX = ".xlsx"
+
+    /**
+     * 错误码名称
+     *
+     * @author nanHuang
+     */
+    object ERROR_NAME {
+        const val SSL_ERROR = "网络连接失败"
+        const val UNKNOWEN_ERROR = "未知的错误，请联系管理员！"
+        const val HTTP_401_ERROR = "登录失效，需要重新登录"
+        const val CONNECT_ERROR = "服务端连接错误！"
+        const val SOCKET_ERROR = "无网络连接！"
+        const val TIMEOUT_ERROR = "服务器连接超时，请检查网络！"
+        const val NET_NOT_CONNECT = "网络未连接，请先连接网络"
+        const val SYSTEM_ERROR = "系统异常，请联系管理员！"
+    }
 }
