@@ -20,7 +20,8 @@ import com.hy.wanandroid.data.state.UiState
 import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchBinding
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
 /**
@@ -33,16 +34,15 @@ class SearchFragment : BaseFragment() {
     private var mBinding: FragmentSearchBinding? = null
     private var mHistoryAdapter: SearchKeyAdapter? = null
     private var mHotKeyAdapter: SearchKeyAdapter? = null
-
-    private var mEtState: MutableStateFlow<String> = MutableStateFlow("")
+    private var mLastSearchKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mParam1 = arguments?.getString(ARG_PARAM1)
         mParam2 = arguments?.getString(ARG_PARAM2)
-        mSearchViewModel = ViewModelProvider(this, defaultViewModelProviderFactory).get(
-            SearchViewModel::class.java
-        )
+        mSearchViewModel = ViewModelProvider(
+            this, defaultViewModelProviderFactory
+        )[SearchViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -80,8 +80,27 @@ class SearchFragment : BaseFragment() {
                 mSearchViewModel?.mSearchEnabled?.set(!TextUtils.isEmpty(s))
             }
 
-            override fun afterTextChanged(s: Editable) {}
+            override fun afterTextChanged(s: Editable) {
+                mSearchViewModel?.etState?.value = s.toString()
+            }
         })
+
+        /**
+         * 这里采用共享ViewModel配合MutableStateFLow来处理EditText值发生变化后是否调用接口。
+         * 在filter里面添加判断，如果当前值与上一次相同，不调用接口；否则判断当前值是否为空
+         */
+        viewLifecycleOwner.lifecycleScope.launch {
+            mSearchViewModel?.etState?.sample(500)?.filter {
+                if (!TextUtils.equals(it, mLastSearchKey)) {
+                    mLastSearchKey = it
+                    it.isNotBlank()
+                } else {
+                    false
+                }
+            }?.collect {
+                mSearchViewModel?.clickEvent(mBinding?.searchBtn)
+            }
+        }
 
         clickRightClear(mBinding?.searchKeyWordEt)
     }
@@ -131,11 +150,6 @@ class SearchFragment : BaseFragment() {
         )
 
         mSearchViewModel?.getHotWords()
-//        (
-//            viewLifecycleOwner
-//        ) { hotWordJsonListRootBean ->
-//            mHotKeyAdapter?.setNewData(hotWordJsonListRootBean?.data)
-//        }
     }
 
     companion object {

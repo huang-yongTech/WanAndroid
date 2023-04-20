@@ -42,6 +42,8 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
     @JvmField
     val mSearchKey = ObservableField<String>()
 
+    val etState: MutableStateFlow<String> = MutableStateFlow("")
+
     /**
      * 搜索历史记录
      */
