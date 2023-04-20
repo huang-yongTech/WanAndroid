@@ -11,7 +11,6 @@ import com.hy.wanandroid.library.util.BarUtils
 import android.text.TextWatcher
 import android.text.Editable
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import com.google.gson.reflect.TypeToken
@@ -20,7 +19,8 @@ import com.hy.wanandroid.data.bean.JsonListRootBean
 import com.hy.wanandroid.data.state.UiState
 import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchBinding
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -33,6 +33,9 @@ class SearchFragment : BaseFragment() {
     private var mBinding: FragmentSearchBinding? = null
     private var mHistoryAdapter: SearchKeyAdapter? = null
     private var mHotKeyAdapter: SearchKeyAdapter? = null
+
+    private var mEtState: MutableStateFlow<String> = MutableStateFlow("")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mParam1 = arguments?.getString(ARG_PARAM1)
@@ -61,6 +64,7 @@ class SearchFragment : BaseFragment() {
         getData()
     }
 
+    @OptIn(FlowPreview::class)
     private fun initView() {
         mBinding?.searchKeyWordEt?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -78,6 +82,7 @@ class SearchFragment : BaseFragment() {
 
             override fun afterTextChanged(s: Editable) {}
         })
+
         clickRightClear(mBinding?.searchKeyWordEt)
     }
 
@@ -108,6 +113,7 @@ class SearchFragment : BaseFragment() {
                             )
                             mHotKeyAdapter?.setNewData(hotWordsData?.data)
                         }
+
                         is UiState.Error<*> -> {
 
                         }

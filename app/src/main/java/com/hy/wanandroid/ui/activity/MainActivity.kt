@@ -29,9 +29,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(mBinding.root)
 
         //5.0 全透明实现，即侧滑栏滑动时，状态栏与侧滑栏交界处透明
-        val controller = WindowCompat.getInsetsController(window, mBinding.root)
+//        val controller = WindowCompat.getInsetsController(window, mBinding.root)
         //状态栏字体颜色为白色
-        controller.isAppearanceLightStatusBars = false
+//        controller.isAppearanceLightStatusBars = false
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = Color.TRANSPARENT
     }

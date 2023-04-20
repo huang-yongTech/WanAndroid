@@ -86,8 +86,8 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
      *
      * @param view view
      */
-    fun clickEvent(view: View) {
-        when (view.id) {
+    fun clickEvent(view: View?) {
+        when (view?.id) {
             R.id.search_back_btn -> Navigation.findNavController(view).navigateUp()
             R.id.search_delete_history_btn -> mHistoryDataSource.deleteKeys()
             R.id.search_btn -> {
