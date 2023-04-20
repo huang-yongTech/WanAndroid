@@ -3,16 +3,16 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion Deps.androidCompileSdkVersion
-    buildToolsVersion Deps.androidBuildToolVersion
+    compileSdkVersion Versions.androidCompileSdkVersion
+    buildToolsVersion Versions.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion Deps.androidMinSdkVersion
-        targetSdkVersion Deps.androidTargetSdkVersion
-        versionCode Deps.androidVersionCode
-        versionName Deps.androidVersionName
+        minSdkVersion Versions.androidMinSdkVersion
+        targetSdkVersion Versions.androidTargetSdkVersion
+        versionCode Versions.androidVersionCode
+        versionName Versions.androidVersionName
 
-        testInstrumentationRunner Deps.testInstrumentationRunner
+        testInstrumentationRunner Versions.testInstrumentationRunner
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -38,18 +38,12 @@ dependencies {
     implementation project(path: ':base')
     implementation project(path: ':library')
 
-    implementation Deps.roomVersion
-    implementation Deps.roomKtxVersion
-    kapt Deps.roomCompilerVersion
+    implementation "androidx.room:room-runtime:${Versions.roomVersion}"
+    implementation "androidx.room:room-ktx:${Versions.roomVersion}"
+    kapt "androidx.room:room-compiler:${Versions.roomVersion}"
 
-    implementation Deps.rxJavaVersion
-    implementation Deps.rxAndroidVersion
-    implementation Deps.okHttpVersion
-    implementation Deps.okHttpLogVersion
-    implementation Deps.retrofitVersion
-    implementation Deps.adapterRxjavaVersion
-    implementation Deps.converterGsonVersion
-}
-repositories {
-    mavenCentral()
+    implementation "com.squareup.okhttp3:okhttp:${Versions.okHttpVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${Versions.okHttpVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${Versions.converterGsonVersion}"
 }

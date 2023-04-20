@@ -3,8 +3,6 @@ package com.hy.wanandroid.data.api
 import android.util.Log
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import com.hy.wanandroid.data.utils.LiveDataCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.Proxy
@@ -37,7 +35,6 @@ class RetrofitUtils private constructor() {
     private fun buildRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

@@ -1,6 +1,6 @@
 package com.hy.wanandroid.ui
 
-import android.app.Application
+import com.hy.wanandroid.library.base.MBaseApplication
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 
@@ -9,7 +9,7 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader
  * email：756655135@qq.com
  * description :
  */
-class App : Application() {
+class App : MBaseApplication() {
     init {
         //设置全局的Header构建器
         SmartRefreshLayout.setDefaultRefreshHeaderCreator { context, layout ->

@@ -2,16 +2,16 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion Deps.androidCompileSdkVersion
-    buildToolsVersion Deps.androidBuildToolVersion
+    compileSdkVersion Versions.androidCompileSdkVersion
+    buildToolsVersion Versions.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion Deps.androidMinSdkVersion
-        targetSdkVersion Deps.androidTargetSdkVersion
-        versionCode Deps.androidVersionCode
-        versionName Deps.androidVersionName
+        minSdkVersion Versions.androidMinSdkVersion
+        targetSdkVersion Versions.androidTargetSdkVersion
+        versionCode Versions.androidVersionCode
+        versionName Versions.androidVersionName
 
-        testInstrumentationRunner Deps.testInstrumentationRunner
+        testInstrumentationRunner Versions.testInstrumentationRunner
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -26,29 +26,26 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api Deps.appcompatVersion
-    api Deps.materialVersion
-    api Deps.supportV4Version
+    api "androidx.appcompat:appcompat:${Versions.appcompatVersion}"
+    api "com.google.android.material:material:${Versions.materialVersion}"
+    api "androidx.legacy:legacy-support-v4:${Versions.supportV4Version}"
 
-    api Deps.navigationFragmentVersion
-    api Deps.navigationUiVersion
+    api "androidx.navigation:navigation-fragment:${Versions.navigationVersion}"
+    api "androidx.navigation:navigation-ui:${Versions.navigationVersion}"
 
-    api Deps.lifecycleViewModelVersion
-    api Deps.lifecycleLiveDataVersion
-    api Deps.lifecycleRuntimeVersion
-    api Deps.lifecycleViewModelSaveStateVersion
-    api Deps.lifecycleCommonJava8Version
-    api Deps.constraintLayoutVersion
+    api "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycleVersion}"
+    api "androidx.lifecycle:lifecycle-livedata:${Versions.lifecycleVersion}"
+    api "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycleVersion}"
+    api "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.lifecycleVersion}"
+    api "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycleVersion}"
+    api "androidx.constraintlayout:constraintlayout:${Versions.constraintLayoutVersion}"
 
-    api Deps.pagingVersion
-    api Deps.ktxCoreVersion
-    api Deps.ktxCoroutineVersion
-    api Deps.ktxViewModel
-    api Deps.ktxRuntime
-    api Deps.ktxLiveData
+    api "androidx.paging:paging-runtime:${Versions.pagingVersion}"
+    api "androidx.core:core-ktx:${Versions.ktxCoreVersion}"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.ktxCoroutine}"
+    api "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.ktxExtension}"
+    api "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.ktxExtension}"
+    api "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.ktxExtension}"
 
-    api Deps.gson
-}
-repositories {
-    mavenCentral()
+    api "com.google.code.gson:gson:${Versions.gson}"
 }

@@ -27,18 +27,6 @@ class HomeViewModel : BaseViewModel() {
 
     val mHomeArticleState: StateFlow<UiState> = _mHomeArticleState
 
-    var mHomeArticleData = MutableLiveData<JsonRootBean<Any?>?>(null)
-
-//    suspend fun queryHomeArticleList(page: Int): JsonRootBean<Any?>? {
-//        return withContext(Dispatchers.IO) {
-//            RetrofitUtils.instance
-//                .getApiService(HomeApi::class.java)
-//                .queryHomeArticleList(page)
-//        }
-//    }
-
-    val mArticleData = MutableLiveData<UiState>(UiState.Success(null))
-
     fun queryHomeArticleList(page: Int, isLoadMore: Boolean) {
         this.isLoadMore = isLoadMore
         viewModelScope.launch {
@@ -59,33 +47,6 @@ class HomeViewModel : BaseViewModel() {
             .queryHomeArticleList(page)
         emit(articleData)
     }
-
-//    fun queryHomeArticleList(page: Int) {
-//        getData(page).runCatching {
-//            mHomeArticleData.value = this.value
-//        }.onFailure {
-//            val jsonRootBean = JsonRootBean<Any?>()
-//            jsonRootBean.errorMsg = handleStrError(it)
-//            jsonRootBean.errorCode = -100
-//            mHomeArticleData.value = jsonRootBean
-//        }
-//        viewModelScope.launch {
-//            mHomeArticleData.value = getData(page)
-//        }
-//    }
-
-//    private suspend fun getData(page: Int): JsonRootBean<Any?>? {
-//        return try {
-//            RetrofitUtils.instance
-//                .getApiService(HomeApi::class.java)
-//                .queryHomeArticleList(page)
-//        } catch (e: Throwable) {
-//            val jsonRootBean = JsonRootBean<Any?>()
-//            jsonRootBean.errorMsg = handleStrError(e)
-//            jsonRootBean.errorCode = -100
-//            jsonRootBean
-//        }
-//    }
 
     /**
      * 点击事件

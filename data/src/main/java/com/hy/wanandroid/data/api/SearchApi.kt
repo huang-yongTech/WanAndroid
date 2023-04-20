@@ -1,10 +1,6 @@
 package com.hy.wanandroid.data.api
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.hy.wanandroid.data.bean.JsonRootBean
-import com.hy.wanandroid.data.bean.PageData
-import com.hy.wanandroid.data.bean.Article
 import com.hy.wanandroid.data.bean.JsonListRootBean
 import com.hy.wanandroid.data.bean.HotWord
 import retrofit2.http.*

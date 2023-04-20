@@ -2,16 +2,16 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion Deps.androidCompileSdkVersion
-    buildToolsVersion Deps.androidBuildToolVersion
+    compileSdkVersion Versions.androidCompileSdkVersion
+    buildToolsVersion Versions.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion Deps.androidMinSdkVersion
-        targetSdkVersion Deps.androidTargetSdkVersion
-        versionCode Deps.androidVersionCode
-        versionName Deps.androidVersionName
+        minSdkVersion Versions.androidMinSdkVersion
+        targetSdkVersion Versions.androidTargetSdkVersion
+        versionCode Versions.androidVersionCode
+        versionName Versions.androidVersionName
 
-        testInstrumentationRunner Deps.testInstrumentationRunner
+        testInstrumentationRunner Versions.testInstrumentationRunner
     }
 
     buildTypes {
@@ -32,14 +32,9 @@ dependencies {
 
     implementation project(path: ':base')
 
-    implementation Deps.rxJavaVersion
-    implementation Deps.rxAndroidVersion
-    implementation Deps.okHttpVersion
-    implementation Deps.retrofitVersion
-    implementation Deps.adapterRxjavaVersion
-    implementation Deps.converterGsonVersion
-    implementation Deps.baseRecyclerViewAdapterHelperVersion
-}
-repositories {
-    mavenCentral()
+    implementation "com.squareup.okhttp3:okhttp:${Versions.okHttpVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${Versions.converterGsonVersion}"
+    implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:${Versions.baseRecyclerViewAdapterHelperVersion}"
+    implementation "androidx.appcompat:appcompat:${Versions.appcompatVersion}"
 }

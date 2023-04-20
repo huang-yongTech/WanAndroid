@@ -3,7 +3,6 @@ package com.hy.wanandroid.data.dao
 import android.app.Application
 import androidx.lifecycle.LiveData
 import com.hy.wanandroid.data.bean.HotWord
-import androidx.lifecycle.MutableLiveData
 
 /**
  * author：created by huangyong on 2020/4/1 17:13
