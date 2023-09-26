@@ -39,6 +39,7 @@ dependencies {
     api "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.lifecycleVersion}"
     api "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycleVersion}"
     api "androidx.constraintlayout:constraintlayout:${Versions.constraintLayoutVersion}"
+    api "androidx.datastore:datastore:${Versions.dataStoreVersion}"
 
     api "androidx.paging:paging-runtime:${Versions.pagingVersion}"
     api "androidx.core:core-ktx:${Versions.ktxCoreVersion}"

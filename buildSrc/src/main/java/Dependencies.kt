@@ -24,12 +24,12 @@ object Versions {
     const val flexBoxVersion = "2.0.1"
     const val roomVersion = "2.4.2"
     const val pagingVersion = "3.1.1"
+    const val dataStoreVersion = "1.0.0"
 
     //third libraries
     const val retrofitVersion = "2.9.0"
     const val converterGsonVersion = "2.9.0"
     const val okHttpVersion = "4.10.0"
-    const val rxPermissionVersion = "0.10.2"
     const val gson = "2.9.1"
 
     const val baseRecyclerViewAdapterHelperVersion = "3.0.1"
@@ -46,7 +46,7 @@ object Versions {
     const val socketIOversion = "1.0.0"
 
     //内存泄漏检测
-    const val leakcanaryVersion = "2.3"
+    const val leakcanaryVersion = "2.9"
 
     //Testing
     const val junitVersion = "4.12"

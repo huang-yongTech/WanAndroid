@@ -21,7 +21,7 @@ class LoggingInterceptor : Interceptor {
         val headers = request.headers
         val names = headers.names()
         val headMap = StringBuilder()
-        if (names.size > 0) {
+        if (names.isNotEmpty()) {
             for (key in names) {
                 val value = headers[key]
                 headMap.append(" ")
@@ -63,7 +63,7 @@ class LoggingInterceptor : Interceptor {
             }
             val source = responseBody!!.source()
             source.request(Long.MAX_VALUE)
-            val buffer = source.buffer()
+            val buffer = source.buffer
             if (charset != null) {
                 res = buffer.clone().readString(charset)
             }
