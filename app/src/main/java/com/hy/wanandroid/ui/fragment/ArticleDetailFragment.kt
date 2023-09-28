@@ -1,7 +1,6 @@
 package com.hy.wanandroid.ui.fragment
 
 import android.os.Bundle
-import com.hy.wanandroid.ui.fragment.ArticleDetailFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

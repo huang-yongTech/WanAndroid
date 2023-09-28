@@ -1,15 +1,20 @@
 package com.hy.wanandroid.library.base
 
-import android.view.ViewGroup
-import android.os.Bundle
-import com.hy.wanandroid.library.util.BarUtils
-import com.hy.wanandroid.library.R
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Application
 import android.graphics.Color
+import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.hy.wanandroid.library.R
+import com.hy.wanandroid.library.util.BarUtils
+
 
 /**
  * BaseFragment
@@ -19,6 +24,10 @@ abstract class BaseFragment protected constructor() : Fragment() {
     private val mParam2: String? = null
     private var mStatusBarView: View? = null
     private val mViewGroup: ViewGroup? = null
+
+    private var mFragmentProvider: ViewModelProvider? = null
+    private var mActivityProvider: ViewModelProvider? = null
+    private var mApplicationProvider: ViewModelProvider? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,6 +48,49 @@ abstract class BaseFragment protected constructor() : Fragment() {
             mStatusBarView!!.requestLayout()
             mViewGroup?.addView(mStatusBarView, 0)
         }
+    }
+
+    fun <T : ViewModel> getFragmentScopeViewModel(modelClass: Class<T>): T? {
+        if (mFragmentProvider == null) {
+            mFragmentProvider = ViewModelProvider(this)
+        }
+        return mFragmentProvider?.get(modelClass)
+    }
+
+    fun <T : ViewModel> getActivityScopeViewModel(modelClass: Class<T>): T? {
+        if (mActivityProvider == null) {
+            mActivityProvider = ViewModelProvider(requireActivity())
+        }
+        return mActivityProvider?.get(modelClass)
+    }
+
+    fun <T : ViewModel> getApplicationScopeViewModel(modelClass: Class<T>): T? {
+        if (mApplicationProvider == null) {
+            mApplicationProvider = ViewModelProvider(
+                (requireActivity().applicationContext as MBaseApplication),
+                getApplicationFactory(requireActivity())
+            )
+        }
+        return mApplicationProvider?.get(modelClass)
+    }
+
+    protected open fun getApplicationFactory(activity: Activity): ViewModelProvider.Factory {
+        checkActivity(this)
+        val application: Application = checkApplication(activity)
+        return ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+    }
+
+    protected open fun checkApplication(activity: Activity): Application {
+        return activity.application
+            ?: throw IllegalStateException(
+                "Your activity/fragment is not yet attached to "
+                        + "Application. You can't request ViewModel before onCreate call."
+            )
+    }
+
+    protected open fun checkActivity(fragment: Fragment) {
+        val activity = fragment.activity
+            ?: throw IllegalStateException("Can't create ViewModelProvider for detached fragment")
     }
 
     /**
@@ -69,7 +121,7 @@ abstract class BaseFragment protected constructor() : Fragment() {
     /**
      * 获取并刷新数据（子类可实现该方法）
      */
-    protected abstract fun getData()
+    protected open fun getData() {}
 
     /**
      * TextView等组件drawableEnd图标的点击事件

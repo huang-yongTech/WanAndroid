@@ -2,13 +2,11 @@ package com.hy.wanandroid.ui.fragment
 
 import android.content.Context
 import android.os.Bundle
-import com.hy.wanandroid.ui.fragment.BitmapFragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.hy.wanandroid.ui.R
 import androidx.appcompat.widget.AppCompatImageView
 import android.graphics.drawable.BitmapDrawable
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.util.Log
 import android.view.View

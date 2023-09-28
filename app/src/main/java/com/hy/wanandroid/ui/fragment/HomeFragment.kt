@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.*
+import androidx.navigation.Navigation
 import com.google.gson.reflect.TypeToken
 import com.hy.wanandroid.data.bean.*
 import com.hy.wanandroid.data.state.UiState
@@ -19,6 +20,7 @@ import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding
+import com.hy.wanandroid.ui.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -28,16 +30,18 @@ class HomeFragment : BaseFragment() {
     private var mParam1: String? = null
     private var mParam2: String? = null
     private var mHomeViewModel: HomeViewModel? = null
+    private var mSharedViewModel: SharedViewModel? = null
     private var mBinding: FragmentHomeBinding? = null
     private var mAdapter: ArticleListAdapter? = null
     private var currPage = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mParam1 = arguments?.getString(ARG_PARAM1)
         mParam2 = arguments?.getString(ARG_PARAM2)
-        mHomeViewModel = ViewModelProvider(this, defaultViewModelProviderFactory).get(
-            HomeViewModel::class.java
-        )
+        mHomeViewModel =
+            ViewModelProvider(this, defaultViewModelProviderFactory)[HomeViewModel::class.java]
+        mSharedViewModel = getActivityScopeViewModel(SharedViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -147,6 +151,19 @@ class HomeFragment : BaseFragment() {
                         else -> {}
                     }
 
+                }
+            }
+
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mSharedViewModel?.menuJumpFlow?.collect {
+                    when (it) {
+                        "我的收藏" -> {
+                            Log.i(TAG, "initRecyclerView: 收到数据${it}")
+                            Navigation.findNavController(mBinding!!.root)
+                                .navigate(R.id.action_home_fragment_to_search_fragment)
+                            mBinding?.homeDrawer?.closeDrawer(GravityCompat.START)
+                        }
+                    }
                 }
             }
         }

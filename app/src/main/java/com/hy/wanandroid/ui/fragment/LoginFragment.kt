@@ -2,7 +2,6 @@ package com.hy.wanandroid.ui.fragment
 
 import com.hy.wanandroid.ui.viewmodel.LoginViewModel
 import android.os.Bundle
-import com.hy.wanandroid.ui.fragment.LoginFragment
 import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.View

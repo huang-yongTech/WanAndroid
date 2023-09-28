@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion Versions.androidCompileSdkVersion
@@ -52,6 +53,33 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets {
+        main {
+            //实际测试指不指定无所谓，不影响 Java 文件生成
+            proto {
+                srcDir 'src/main/proto'
+            }
+        }
+    }
+}
+
+protobuf {
+    //配置 protoc 编译器
+    protoc {
+        artifact = "com.google.protobuf:protoc:${Versions.protoJavaVersion}"
+    }
+    //配置生成目录，编译后会在 build 的目录下生成对应的java文件
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.builtins {
+                java {}
+            }
+        }
+    }
 }
 
 dependencies {
@@ -75,6 +103,8 @@ dependencies {
 
     //内存泄漏检测
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${Versions.leakcanaryVersion}"
+
+    implementation "com.google.protobuf:protobuf-java:${Versions.protoJavaVersion}"
 }
 
 /**

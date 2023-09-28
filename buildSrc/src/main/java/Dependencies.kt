@@ -14,7 +14,7 @@ object Versions {
     const val ktxExtension = "2.4.1"
 
     //android libraries
-    const val appcompatVersion = "1.5.1"
+    const val appcompatVersion = "1.6.1"
     const val materialVersion = "1.6.1"
     const val supportV4Version = "1.0.0"
     const val collectionVersion = "1.1.0"
@@ -31,6 +31,8 @@ object Versions {
     const val converterGsonVersion = "2.9.0"
     const val okHttpVersion = "4.10.0"
     const val gson = "2.9.1"
+
+    const val protoJavaVersion = "3.19.2"
 
     const val baseRecyclerViewAdapterHelperVersion = "3.0.1"
     const val smartRefreshlayoutVersion = "1.1.0"

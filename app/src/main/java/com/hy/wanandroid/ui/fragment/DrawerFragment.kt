@@ -2,33 +2,47 @@ package com.hy.wanandroid.ui.fragment
 
 import com.hy.wanandroid.ui.viewmodel.DrawerViewModel
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.Navigation
 import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.data.bean.MenuItem
+import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.adapter.MenuItemAdapter
 import com.hy.wanandroid.ui.databinding.FragmentDrawerBinding
+import com.hy.wanandroid.ui.viewmodel.HomeViewModel
+import com.hy.wanandroid.ui.viewmodel.SharedViewModel
+import kotlinx.coroutines.launch
 import java.util.ArrayList
 
 /**
  * 侧滑菜单fragment
  */
-class DrawerFragment : Fragment() {
+class DrawerFragment : BaseFragment() {
     private var mParam1: String? = null
     private var mParam2: String? = null
     private var mBinding: FragmentDrawerBinding? = null
     private var mViewModel: DrawerViewModel? = null
     private var mMenuItemList: MutableList<MenuItem?>? = null
     private var mAdapter: MenuItemAdapter? = null
+    private var mSharedViewModel: SharedViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mParam1 = arguments?.getString(ARG_PARAM1)
         mParam2 = arguments?.getString(ARG_PARAM2)
-        mViewModel = ViewModelProvider(viewModelStore, defaultViewModelProviderFactory)
-            .get(DrawerViewModel::class.java)
+        mViewModel = ViewModelProvider(
+            viewModelStore,
+            defaultViewModelProviderFactory
+        )[DrawerViewModel::class.java]
+        mSharedViewModel = getActivityScopeViewModel(SharedViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -51,7 +65,19 @@ class DrawerFragment : Fragment() {
     private fun initRecyclerView() {
         mAdapter = MenuItemAdapter()
         mBinding?.drawerRecyclerView?.adapter = mAdapter
-        mAdapter?.setOnItemClickListener { adapter, view, position -> }
+        mAdapter?.setOnItemClickListener { adapter, view, position ->
+            val item: MenuItem? = mAdapter?.getItem(position)
+            when (item?.title) {
+                "我的收藏" -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        repeatOnLifecycle(Lifecycle.State.STARTED) {
+                            mSharedViewModel?.menuJumpFlow?.tryEmit(item.title)
+                            Log.i("TAG", "initRecyclerView: 发射数据${item.title}")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun initData() {

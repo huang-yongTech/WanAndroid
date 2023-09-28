@@ -6,12 +6,6 @@
     app:startDestination="@id/nav_fragment_home"
     tools:ignore="UnusedNavigation">
 
-<!--    <fragment-->
-<!--        android:id="@+id/nav_fragment_test"-->
-<!--        android:name="com.hy.wanandroid.ui.fragment.BitmapFragment"-->
-<!--        android:label="BitmapFragment"-->
-<!--        tools:layout="@layout/fragment_bitmap" />-->
-
     <fragment
         android:id="@+id/nav_fragment_home"
         android:name="com.hy.wanandroid.ui.fragment.HomeFragment"
@@ -20,6 +14,13 @@
         <action
             android:id="@+id/action_home_fragment_to_search_fragment"
             app:destination="@id/nav_fragment_search"
+            app:enterAnim="@anim/h_fragment_enter"
+            app:exitAnim="@anim/h_fragment_exit"
+            app:popEnterAnim="@anim/h_fragment_pop_enter"
+            app:popExitAnim="@anim/h_fragment_pop_exit" />
+        <action
+            android:id="@+id/action_home_fragment_to_data_store_fragment"
+            app:destination="@id/nav_data_store_fragment"
             app:enterAnim="@anim/h_fragment_enter"
             app:exitAnim="@anim/h_fragment_exit"
             app:popEnterAnim="@anim/h_fragment_pop_enter"
@@ -46,4 +47,10 @@
         android:name="com.hy.wanandroid.ui.fragment.SearchResultFragment"
         android:label="fragment_search_result"
         tools:layout="@layout/fragment_search_result" />
+
+    <fragment
+        android:id="@+id/nav_data_store_fragment"
+        android:name="com.hy.wanandroid.ui.fragment.DataStoreTestFragment"
+        android:label="nav_data_store_drawer"
+        tools:layout="@layout/fragment_data_store_test" />
 </navigation>
