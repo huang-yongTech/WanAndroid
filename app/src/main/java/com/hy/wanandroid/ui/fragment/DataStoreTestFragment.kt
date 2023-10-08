@@ -1,20 +1,19 @@
 package com.hy.wanandroid.ui.fragment
 
-import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.hy.wanandroid.ui.DataModelPreference
+import com.hy.wanandroid.library.base.BaseFragment
+import com.hy.wanandroid.library.util.BarUtils
 import com.hy.wanandroid.ui.R
-import com.hy.wanandroid.ui.data.DataModelSerializer
+import com.hy.wanandroid.ui.data.DataModelSerializer.dataStore
 import com.hy.wanandroid.ui.databinding.FragmentDataStoreTestBinding
 import com.hy.wanandroid.ui.viewmodel.DataStoreViewModel
 import kotlinx.coroutines.launch
@@ -27,17 +26,12 @@ private const val ARG_PARAM2 = "param2"
  * Use the [DataStoreTestFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class DataStoreTestFragment : Fragment() {
+class DataStoreTestFragment : BaseFragment() {
     private var param1: String? = null
     private var param2: String? = null
 
     private var mBinding: FragmentDataStoreTestBinding? = null
     private var mViewModel: DataStoreViewModel? = null
-
-    private val Context.dataStore: DataStore<DataModelPreference> by dataStore(
-        fileName = PROTO_DATA_FILE_NAME,
-        serializer = DataModelSerializer
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,26 +51,36 @@ class DataStoreTestFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_data_store_test, container, false)
         mBinding = FragmentDataStoreTestBinding.bind(view)
+        BarUtils.setAppToolBarMarginTop(
+            requireContext(),
+            mBinding?.dataStoreAppbar?.publicToolbar
+        )
         initViews()
         return mBinding?.root
     }
 
     private fun initViews() {
-        mBinding?.dataStoreAppbar?.publicTitleTv?.text = "DataStore测试"
+        mBinding?.dataStoreAppbar?.title = "DataStore测试"
 
+        mBinding?.dataStoreSaveBtn?.setOnClickListener {
+            mViewModel?.updateText("张三", 22, dataStore = context?.dataStore)
+            observeData()
+        }
+
+        mBinding?.dataStoreReadBtn?.setOnClickListener {
+            mViewModel?.getText(dataStore = context?.dataStore)
+            observeData()
+        }
+    }
+
+    private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mViewModel?.dataModelFlow?.collect {
+                    Log.i(TAG, "initViews: 获取DataStore数据")
                     mBinding?.dataStoreTv?.text = "${it.name} ${it.age}"
                 }
             }
-        }
-
-        mBinding?.dataStoreSaveBtn?.setOnClickListener {
-            mViewModel?.updateText(dataStore = context?.dataStore)
-        }
-        mBinding?.dataStoreReadBtn?.setOnClickListener {
-            mViewModel?.getText(dataStore = context?.dataStore)
         }
     }
 
@@ -95,6 +99,6 @@ class DataStoreTestFragment : Fragment() {
                 }
             }
 
-        private const val PROTO_DATA_FILE_NAME: String = "data_model_preference.pb"
+        private const val TAG = "DataStoreTestFragment"
     }
 }

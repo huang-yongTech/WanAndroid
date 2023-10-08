@@ -24,9 +24,7 @@ public class MBaseApplication extends Application implements ViewModelStoreOwner
     public void onCreate() {
         super.onCreate();
         applicationRef = new WeakReference<>(this);
-        contextRef = new WeakReference<Context>(this);
-
-        mAppViewModelStore = new ViewModelStore();
+        contextRef = new WeakReference<>(this);
     }
 
     //突破64k
@@ -50,6 +48,7 @@ public class MBaseApplication extends Application implements ViewModelStoreOwner
     @NonNull
     @Override
     public ViewModelStore getViewModelStore() {
+        if (mAppViewModelStore == null) mAppViewModelStore = new ViewModelStore();
         return mAppViewModelStore;
     }
 }

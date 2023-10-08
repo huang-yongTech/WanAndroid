@@ -3,12 +3,14 @@ package com.hy.wanandroid.library.base
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +30,13 @@ abstract class BaseFragment protected constructor() : Fragment() {
     private var mFragmentProvider: ViewModelProvider? = null
     private var mActivityProvider: ViewModelProvider? = null
     private var mApplicationProvider: ViewModelProvider? = null
+
+    protected open lateinit var mActivity: AppCompatActivity
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mActivity = context as AppCompatActivity
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,26 +59,26 @@ abstract class BaseFragment protected constructor() : Fragment() {
         }
     }
 
-    fun <T : ViewModel> getFragmentScopeViewModel(modelClass: Class<T>): T? {
+    protected open fun <T : ViewModel> getFragmentScopeViewModel(modelClass: Class<T>): T? {
         if (mFragmentProvider == null) {
             mFragmentProvider = ViewModelProvider(this)
         }
         return mFragmentProvider?.get(modelClass)
     }
 
-    fun <T : ViewModel> getActivityScopeViewModel(modelClass: Class<T>): T? {
+    protected open fun <T : ViewModel> getActivityScopeViewModel(
+        activity: AppCompatActivity,
+        modelClass: Class<T>
+    ): T? {
         if (mActivityProvider == null) {
-            mActivityProvider = ViewModelProvider(requireActivity())
+            mActivityProvider = ViewModelProvider(activity)
         }
         return mActivityProvider?.get(modelClass)
     }
 
-    fun <T : ViewModel> getApplicationScopeViewModel(modelClass: Class<T>): T? {
+    protected open fun <T : ViewModel> getApplicationScopeViewModel(modelClass: Class<T>): T? {
         if (mApplicationProvider == null) {
-            mApplicationProvider = ViewModelProvider(
-                (requireActivity().applicationContext as MBaseApplication),
-                getApplicationFactory(requireActivity())
-            )
+            mApplicationProvider = ViewModelProvider(MBaseApplication.getInstance())
         }
         return mApplicationProvider?.get(modelClass)
     }

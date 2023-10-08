@@ -7,17 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.Navigation
 import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.data.bean.MenuItem
 import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.adapter.MenuItemAdapter
 import com.hy.wanandroid.ui.databinding.FragmentDrawerBinding
-import com.hy.wanandroid.ui.viewmodel.HomeViewModel
 import com.hy.wanandroid.ui.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 import java.util.ArrayList
@@ -42,7 +37,7 @@ class DrawerFragment : BaseFragment() {
             viewModelStore,
             defaultViewModelProviderFactory
         )[DrawerViewModel::class.java]
-        mSharedViewModel = getActivityScopeViewModel(SharedViewModel::class.java)
+        mSharedViewModel = getActivityScopeViewModel(mActivity, SharedViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -58,23 +53,18 @@ class DrawerFragment : BaseFragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
     private fun initRecyclerView() {
         mAdapter = MenuItemAdapter()
         mBinding?.drawerRecyclerView?.adapter = mAdapter
         mAdapter?.setOnItemClickListener { adapter, view, position ->
             val item: MenuItem? = mAdapter?.getItem(position)
             when (item?.title) {
-                "我的收藏" -> {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        repeatOnLifecycle(Lifecycle.State.STARTED) {
-                            mSharedViewModel?.menuJumpFlow?.tryEmit(item.title)
-                            Log.i("TAG", "initRecyclerView: 发射数据${item.title}")
-                        }
-                    }
+                title1 -> {
+//                    viewLifecycleOwner.lifecycleScope.launch {
+//                        mSharedViewModel?.menuArticleFlow?.emit(item.title)
+//                        Log.i("TAG", "initRecyclerView: 发射数据${item.title}")
+//                    }
+                    mSharedViewModel?.menuJump?.value = item.title
                 }
             }
         }
@@ -82,11 +72,11 @@ class DrawerFragment : BaseFragment() {
 
     private fun initData() {
         mMenuItemList = ArrayList()
-        mMenuItemList?.add(MenuItem(R.drawable.ic_unfavor, "我的收藏"))
-        mMenuItemList?.add(MenuItem(R.drawable.ic_knowledge_system, "知识体系"))
-        mMenuItemList?.add(MenuItem(R.drawable.ic_classification, "项目分类"))
-        mMenuItemList?.add(MenuItem(R.drawable.ic_navigation, "网址导航"))
-        mMenuItemList?.add(MenuItem(R.drawable.ic_about, "关于我们"))
+        mMenuItemList?.add(MenuItem(R.drawable.ic_unfavor, title1))
+        mMenuItemList?.add(MenuItem(R.drawable.ic_knowledge_system, title2))
+        mMenuItemList?.add(MenuItem(R.drawable.ic_classification, title3))
+        mMenuItemList?.add(MenuItem(R.drawable.ic_navigation, title4))
+        mMenuItemList?.add(MenuItem(R.drawable.ic_about, title5))
         mAdapter?.setNewData(mMenuItemList)
     }
 
@@ -106,5 +96,11 @@ class DrawerFragment : BaseFragment() {
             fragment.arguments = args
             return fragment
         }
+
+        const val title1 = "DataStore测试"
+        const val title2 = "知识体系"
+        const val title3 = "项目分类"
+        const val title4 = "网址导航"
+        const val title5 = "关于我们"
     }
 }

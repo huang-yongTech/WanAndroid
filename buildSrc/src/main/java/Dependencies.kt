@@ -32,6 +32,9 @@ object Versions {
     const val okHttpVersion = "4.10.0"
     const val gson = "2.9.1"
 
+    //防数据倒灌LiveData
+    const val unpeekLiveData = "7.2.0-beta1"
+
     const val protoJavaVersion = "3.19.2"
 
     const val baseRecyclerViewAdapterHelperVersion = "3.0.1"
