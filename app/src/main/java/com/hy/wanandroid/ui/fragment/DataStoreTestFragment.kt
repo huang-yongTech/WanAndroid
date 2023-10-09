@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.library.util.BarUtils
 import com.hy.wanandroid.ui.R
+import com.hy.wanandroid.ui.click.PublicClickProxy
 import com.hy.wanandroid.ui.data.DataModelSerializer.dataStore
 import com.hy.wanandroid.ui.databinding.FragmentDataStoreTestBinding
 import com.hy.wanandroid.ui.viewmodel.DataStoreViewModel
@@ -51,6 +52,7 @@ class DataStoreTestFragment : BaseFragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_data_store_test, container, false)
         mBinding = FragmentDataStoreTestBinding.bind(view)
+        mBinding?.vm = mViewModel
         BarUtils.setAppToolBarMarginTop(
             requireContext(),
             mBinding?.dataStoreAppbar?.publicToolbar
@@ -61,6 +63,7 @@ class DataStoreTestFragment : BaseFragment() {
 
     private fun initViews() {
         mBinding?.dataStoreAppbar?.title = "DataStore测试"
+        mBinding?.dataStoreAppbar?.clickProxy = PublicClickProxy()
 
         mBinding?.dataStoreSaveBtn?.setOnClickListener {
             mViewModel?.updateText("张三", 22, dataStore = context?.dataStore)
