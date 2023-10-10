@@ -60,11 +60,11 @@ class DrawerFragment : BaseFragment() {
             val item: MenuItem? = mAdapter?.getItem(position)
             when (item?.title) {
                 title1 -> {
-//                    viewLifecycleOwner.lifecycleScope.launch {
-//                        mSharedViewModel?.menuArticleFlow?.emit(item.title)
-//                        Log.i("TAG", "initRecyclerView: 发射数据${item.title}")
-//                    }
-                    mSharedViewModel?.menuJump?.value = item.title
+                    lifecycleScope.launch {
+                        mSharedViewModel?.menuArticleFlow?.emit(item.title)
+                        Log.i("TAG", "initRecyclerView: 发射数据${item.title}")
+                    }
+//                    mSharedViewModel?.menuJump?.value = item.title
                 }
             }
         }
