@@ -3,16 +3,11 @@ package com.hy.wanandroid.ui.viewmodel
 import android.view.View
 import com.hy.wanandroid.ui.R
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.hy.wanandroid.data.api.RetrofitUtils
-import com.hy.wanandroid.data.api.HomeApi
 import androidx.navigation.Navigation
-import com.hy.wanandroid.data.bean.JsonRootBean
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import com.hy.wanandroid.data.state.BaseViewModel
-import com.hy.wanandroid.data.state.UiState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import com.hy.wanandroid.ui.source.ArticlePagingSource
 
 /**
  * author：created by huangyong on 2020/3/26 11:23
@@ -23,30 +18,9 @@ class HomeViewModel : BaseViewModel() {
     //侧滑菜单打开标志
     val mOpenDrawer = MutableLiveData<Boolean>()
 
-    private val _mHomeArticleState = MutableStateFlow<UiState>(UiState.Success(null))
-
-    val mHomeArticleState: StateFlow<UiState> = _mHomeArticleState
-
-    fun queryHomeArticleList(page: Int, isLoadMore: Boolean) {
-        this.isLoadMore = isLoadMore
-        viewModelScope.launch {
-            getData(page)
-                .flowOn(Dispatchers.IO)
-                .catch { exception ->
-                    _mHomeArticleState.value = UiState.Error(handleObjError(exception))
-                }
-                .collect {
-                    _mHomeArticleState.value = UiState.Success(it)
-                }
-        }
-    }
-
-    private fun getData(page: Int) = flow {
-        val articleData = RetrofitUtils.instance
-            .getApiService(HomeApi::class.java)
-            .queryHomeArticleList(page)
-        emit(articleData)
-    }
+    fun getArticleList() = Pager(PagingConfig(pageSize = 1)) {
+        ArticlePagingSource()
+    }.flow
 
     /**
      * 点击事件

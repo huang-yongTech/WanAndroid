@@ -14,17 +14,14 @@ import com.hy.wanandroid.ui.databinding.ItemArticleLayoutBinding
  * email：756655135@qq.com
  * description :
  */
-class ArticleListAdapter : BaseQuickAdapter<Article?, BaseViewHolder>(R.layout.item_article_layout),
+class ArticleListAdapter : BaseQuickAdapter<Article, BaseViewHolder>(R.layout.item_article_layout),
     LoadMoreModule {
     override fun onItemViewHolderCreated(viewHolder: BaseViewHolder, viewType: Int) {
         super.onItemViewHolderCreated(viewHolder, viewType)
         DataBindingUtil.bind<ViewDataBinding>(viewHolder.itemView)
     }
 
-    override fun convert(helper: BaseViewHolder, item: Article?) {
-        if (item == null) {
-            return
-        }
+    override fun convert(helper: BaseViewHolder, item: Article) {
         val binding: ItemArticleLayoutBinding? = helper.getBinding()
         binding?.article = item
         binding?.executePendingBindings()

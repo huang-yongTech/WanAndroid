@@ -11,7 +11,7 @@ package com.hy.wanandroid.data.bean
  */
 class PageData<T> {
     var curPage = 0
-    var datas: MutableList<T?>? = null
+    var datas: MutableList<T>? = null
     var offset = 0
     var over = false
     var pageCount = 0

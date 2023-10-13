@@ -102,6 +102,7 @@ class SearchResultFragment : BaseFragment() {
                                 mAdapter?.loadMoreModule?.loadMoreEnd()
                             }
                         }
+
                         is UiState.Error<*> -> {
                             mAdapter?.setEmptyView(getErrorView(mBinding?.searchResultRecyclerView))
                         }

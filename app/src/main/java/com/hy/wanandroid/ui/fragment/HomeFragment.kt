@@ -2,7 +2,6 @@ package com.hy.wanandroid.ui.fragment
 
 import com.hy.wanandroid.library.base.BaseFragment
 import com.hy.wanandroid.ui.viewmodel.HomeViewModel
-import com.hy.wanandroid.ui.adapter.ArticleListAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,14 +14,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
-import com.google.gson.reflect.TypeToken
-import com.hy.wanandroid.data.bean.*
-import com.hy.wanandroid.data.state.UiState
-import com.hy.wanandroid.library.util.GsonUtils
+import androidx.paging.LoadState
 import com.hy.wanandroid.library.util.ToastUtils
 import com.hy.wanandroid.ui.R
-import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
+import com.hy.wanandroid.ui.adapter.ArticleAdapter
+import com.hy.wanandroid.ui.adapter.FootAdapter
 import com.hy.wanandroid.ui.databinding.FragmentHomeBinding
 import com.hy.wanandroid.ui.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
@@ -36,8 +33,7 @@ class HomeFragment : BaseFragment() {
     private var mHomeViewModel: HomeViewModel? = null
     private var mSharedViewModel: SharedViewModel? = null
     private var mBinding: FragmentHomeBinding? = null
-    private var mAdapter: ArticleListAdapter? = null
-    private var currPage = 0
+    private var mArticleAdapter: ArticleAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,15 +96,26 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun initAdapter() {
-        mAdapter = ArticleListAdapter()
-        mAdapter?.setOnItemClickListener { adapter, view, position ->
-            ToastUtils.showToast("位置$position")
+        mArticleAdapter = ArticleAdapter(requireContext()) { position, article, adapter ->
+            ToastUtils.showToast(article?.title)
         }
-        mAdapter?.loadMoreModule?.loadMoreView = CustomLoadMoreView()
-        mAdapter?.loadMoreModule?.setOnLoadMoreListener { loadMore() }
-        mAdapter?.loadMoreModule?.isAutoLoadMore = true
-        //当自动加载开启，同时数据不满一屏时，是否继续执行自动加载更多(默认为true)
-        mAdapter?.loadMoreModule?.isEnableLoadMoreIfNotFullPage = false
+        mArticleAdapter?.addLoadStateListener {
+            when (it.refresh) {
+                is LoadState.NotLoading -> {
+                    Log.e(TAG, "initAdapter: NotLoading")
+                }
+
+                is LoadState.Loading -> {
+                    Log.e(TAG, "initAdapter: Loading")
+                }
+
+                is LoadState.Error -> {
+                    Log.e(TAG, "initAdapter: Error")
+                }
+
+                else -> {}
+            }
+        }
     }
 
     private fun initRecyclerView() {
@@ -118,47 +125,9 @@ class HomeFragment : BaseFragment() {
                 LinearItemDecoration.VERTICAL
             )
         )
-        mBinding?.homeRecyclerView?.adapter = mAdapter
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mHomeViewModel?.mHomeArticleState?.collect { uiState: UiState ->
-                    when (uiState) {
-                        is UiState.Success<*> -> {
-                            if (uiState.result == null) {
-                                mAdapter?.setEmptyView(getEmptyDataView(mBinding?.homeRecyclerView))
-                            } else {
-                                val json = GsonUtils.toJson(uiState.result)
-                                val articleData =
-                                    GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
-                                        json,
-                                        object : TypeToken<JsonRootBean<PageData<Article>>>() {
-                                        }.type
-                                    )
-                                if (articleData == null) {
-                                    mAdapter?.loadMoreModule?.loadMoreEnd()
-                                } else {
-                                    mAdapter?.loadMoreModule?.loadMoreComplete()
-                                }
-
-                                if (mHomeViewModel?.isLoadMore == true) {
-                                    articleData?.data?.datas?.let { mAdapter?.addData(it) }
-                                } else {
-                                    mAdapter?.setNewData(articleData?.data?.datas)
-                                }
-                            }
-                        }
-
-                        is UiState.Error<*> -> {
-                            mAdapter?.setEmptyView(getErrorView(mBinding?.homeRecyclerView))
-                        }
-
-                        else -> {}
-                    }
-
-                }
-            }
-        }
+        val withLoadStateAdapter =
+            mArticleAdapter?.withLoadStateFooter(FootAdapter(requireContext()))
+        mBinding?.homeRecyclerView?.adapter = withLoadStateAdapter
 
         /**
          * 注意：
@@ -181,17 +150,6 @@ class HomeFragment : BaseFragment() {
                 }
             }
         }
-
-//        mSharedViewModel?.menuJump?.observe(viewLifecycleOwner) {
-//            when (it) {
-//                DrawerFragment.title1 -> {
-//                    Log.i(TAG, "initRecyclerView: 收到数据${it}")
-//                    Navigation.findNavController(mBinding!!.root)
-//                        .navigate(R.id.action_home_fragment_to_data_store_fragment)
-//                    mBinding?.homeDrawer?.closeDrawer(GravityCompat.START)
-//                }
-//            }
-//        }
     }
 
     override fun onStop() {
@@ -210,17 +168,11 @@ class HomeFragment : BaseFragment() {
      * 下拉刷新数据
      */
     override fun getData() {
-        mAdapter?.setEmptyView(getLoadingView(mBinding?.homeRecyclerView))
-        currPage = 0
-        mHomeViewModel?.queryHomeArticleList(currPage, false)
-    }
-
-    /**
-     * 上拉加载数据
-     */
-    private fun loadMore() {
-        currPage++
-        mHomeViewModel?.queryHomeArticleList(currPage, true)
+        viewLifecycleOwner.lifecycleScope.launch {
+            mHomeViewModel?.getArticleList()?.collect {
+                mArticleAdapter?.submitData(it)
+            }
+        }
     }
 
     companion object {
