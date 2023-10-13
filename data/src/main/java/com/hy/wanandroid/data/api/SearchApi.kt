@@ -1,8 +1,10 @@
 package com.hy.wanandroid.data.api
 
+import com.hy.wanandroid.data.bean.Article
 import com.hy.wanandroid.data.bean.JsonRootBean
 import com.hy.wanandroid.data.bean.JsonListRootBean
 import com.hy.wanandroid.data.bean.HotWord
+import com.hy.wanandroid.data.bean.PageData
 import retrofit2.http.*
 
 /**
@@ -32,4 +34,18 @@ interface SearchApi {
         @Path("page") page: Int,
         @Field("k") key: String?
     ): JsonRootBean<Any?>?
+
+    /**
+     * 根据关键词查找文章
+     *
+     * @param page 页码
+     * @param key  关键字
+     * @return 结果集
+     */
+    @FormUrlEncoded
+    @POST("article/query/{page}/json")
+    suspend fun getArticlesByKey(
+        @Path("page") page: Int,
+        @Field("k") key: String?
+    ): JsonRootBean<PageData<Article>?>?
 }

@@ -17,15 +17,11 @@ import com.hy.wanandroid.ui.click.PublicClickProxy
 import com.hy.wanandroid.library.util.BarUtils
 import com.hy.wanandroid.library.widget.CustomLoadMoreView
 import com.hy.wanandroid.library.widget.LinearItemDecoration
-import com.google.gson.reflect.TypeToken
 import com.hy.wanandroid.data.bean.Article
-import com.hy.wanandroid.data.bean.JsonRootBean
 import com.hy.wanandroid.data.bean.PageData
-import com.hy.wanandroid.data.state.UiState
+import com.hy.wanandroid.data.state.DataState
 import com.hy.wanandroid.library.util.Constant
-import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.ui.databinding.FragmentSearchResultBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
@@ -88,24 +84,30 @@ class SearchResultFragment : BaseFragment() {
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mViewModel?.searchArticle?.collect {
+                mViewModel?.article?.collect {
                     when (it) {
-                        is UiState.Success<*> -> {
-                            val json = GsonUtils.toJson(it.result)
-                            Log.e(TAG, "onCodeSuccess: json = $json")
-                            val result = GsonUtils.fromJson<JsonRootBean<PageData<Article>>>(
-                                json,
-                                object : TypeToken<JsonRootBean<PageData<Article>>>() {}.type
-                            )
-                            mAdapter?.setNewData(result?.data?.datas)
-                            if (result?.data?.pageCount == 1) {
+                        is DataState.OnSuccess<PageData<Article>?>? -> {
+                            val articlePage = it?.result?.data
+                            if (articlePage != null) {
+                                if (articlePage.curPage < articlePage.pageCount) {
+                                    mAdapter?.addData(articlePage.datas!!)
+                                } else {
+                                    mAdapter?.setNewData(articlePage.datas)
+                                }
+                            }
+
+                            if (articlePage?.pageCount == 1) {
                                 mAdapter?.loadMoreModule?.loadMoreEnd()
+                            } else {
+                                mAdapter?.loadMoreModule?.loadMoreComplete()
                             }
                         }
 
-                        is UiState.Error<*> -> {
+                        is DataState.OnNetError -> {
                             mAdapter?.setEmptyView(getErrorView(mBinding?.searchResultRecyclerView))
                         }
+
+                        else -> {}
                     }
                 }
             }
@@ -115,11 +117,14 @@ class SearchResultFragment : BaseFragment() {
     /**
      * 加载更多
      */
-    private fun loadMore() {}
+    private fun loadMore() {
+        mViewModel?.getArticlesByKey(0, key = mSearchKey, isLoadMore = true)
+    }
+
     override fun getData() {
         Log.e(TAG, "getData: 获取数据")
         mAdapter?.setEmptyView(getLoadingView(mBinding?.searchResultRecyclerView))
-        mViewModel?.queryArticlesByKey(0, key = mSearchKey, isLoadMore = false)
+        mViewModel?.getArticlesByKey(0, key = mSearchKey, isLoadMore = false)
     }
 
     companion object {

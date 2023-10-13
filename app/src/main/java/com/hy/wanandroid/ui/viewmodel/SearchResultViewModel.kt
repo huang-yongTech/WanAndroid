@@ -3,8 +3,10 @@ package com.hy.wanandroid.ui.viewmodel
 import androidx.lifecycle.viewModelScope
 import com.hy.wanandroid.data.api.RetrofitUtils
 import com.hy.wanandroid.data.api.SearchApi
+import com.hy.wanandroid.data.bean.Article
+import com.hy.wanandroid.data.bean.PageData
 import com.hy.wanandroid.data.state.BaseViewModel
-import com.hy.wanandroid.data.state.UiState
+import com.hy.wanandroid.data.state.DataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,28 +17,29 @@ import kotlinx.coroutines.launch
  * description :
  */
 class SearchResultViewModel : BaseViewModel() {
-    private val _searchArticles = MutableStateFlow<UiState>(UiState.Success(null))
-    val searchArticle: StateFlow<UiState> = _searchArticles
+    private val _articles =
+        MutableStateFlow<DataState<PageData<Article>?>?>(DataState.OnSuccess(null))
+    val article: StateFlow<DataState<PageData<Article>?>?> = _articles
 
     /**
      * 根据关键字搜索文章
      */
-    fun queryArticlesByKey(page: Int, key: String?, isLoadMore: Boolean) {
+    fun getArticlesByKey(page: Int, key: String?, isLoadMore: Boolean) {
         this.isLoadMore = isLoadMore
 
         viewModelScope.launch {
             flow {
                 val articles = RetrofitUtils.instance
                     .getApiService(SearchApi::class.java)
-                    .queryArticlesByKey(page, key)
+                    .getArticlesByKey(page, key)
                 emit(articles)
             }
                 .flowOn(Dispatchers.IO)
                 .catch { exception ->
-                    _searchArticles.value = UiState.Error(handleObjError(exception))
+                    _articles.value = DataState.OnNetError(handleObjError(exception))
                 }
                 .collect {
-                    _searchArticles.value = UiState.Success(it)
+                    _articles.value = DataState.OnSuccess(it)
                 }
         }
     }
