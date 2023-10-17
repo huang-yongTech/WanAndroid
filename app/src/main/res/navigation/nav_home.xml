@@ -11,6 +11,7 @@
         android:name="com.hy.wanandroid.ui.fragment.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
+
         <action
             android:id="@+id/action_home_fragment_to_search_fragment"
             app:destination="@id/nav_fragment_search"
@@ -18,6 +19,7 @@
             app:exitAnim="@anim/h_fragment_exit"
             app:popEnterAnim="@anim/h_fragment_pop_enter"
             app:popExitAnim="@anim/h_fragment_pop_exit" />
+
         <action
             android:id="@+id/action_home_fragment_to_data_store_fragment"
             app:destination="@id/nav_data_store_fragment"
@@ -51,6 +53,18 @@
     <fragment
         android:id="@+id/nav_data_store_fragment"
         android:name="com.hy.wanandroid.ui.fragment.DataStoreTestFragment"
-        android:label="nav_data_store_drawer"
-        tools:layout="@layout/fragment_data_store_test" />
+        android:label="fragment_data_store"
+        tools:layout="@layout/fragment_data_store_test">
+
+        <!--备注：这里的fragment由于是从DrawerFragment发起跳转通知，经过HomeFragment跳转而来，
+        因此这里需要添加一个一摸一样的action，同时还需要添加上popupTo属性-->
+        <action
+            android:id="@+id/action_home_fragment_to_data_store_fragment"
+            app:destination="@id/nav_data_store_fragment"
+            app:enterAnim="@anim/h_fragment_enter"
+            app:exitAnim="@anim/h_fragment_exit"
+            app:popEnterAnim="@anim/h_fragment_pop_enter"
+            app:popExitAnim="@anim/h_fragment_pop_exit"
+            app:popUpTo="@id/nav_fragment_home" />
+    </fragment>
 </navigation>

@@ -144,7 +144,7 @@ class HomeFragment : BaseFragment() {
                             Log.i(TAG, "initRecyclerView: 收到数据${it}")
                             Navigation.findNavController(mBinding!!.root)
                                 .navigate(R.id.action_home_fragment_to_data_store_fragment)
-                            mBinding?.homeDrawer?.closeDrawer(GravityCompat.START)
+                            mHomeViewModel?.mOpenDrawer?.value = false
                         }
                     }
                 }
