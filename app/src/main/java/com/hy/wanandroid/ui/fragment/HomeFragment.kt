@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -15,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.paging.LoadState
+import com.hy.wanandroid.library.util.GsonUtils
 import com.hy.wanandroid.library.util.ToastUtils
 import com.hy.wanandroid.ui.R
 import com.hy.wanandroid.library.widget.LinearItemDecoration
@@ -97,7 +99,10 @@ class HomeFragment : BaseFragment() {
 
     private fun initAdapter() {
         mArticleAdapter = ArticleAdapter(requireContext()) { position, article, adapter ->
-            ToastUtils.showToast(article?.title)
+            val bundle = bundleOf()
+            bundle.putString("article", GsonUtils.toJson(article))
+            Navigation.findNavController(requireView())
+                .navigate(R.id.action_home_fragment_to_article_detail_fragment, bundle)
         }
         mArticleAdapter?.addLoadStateListener {
             when (it.refresh) {
